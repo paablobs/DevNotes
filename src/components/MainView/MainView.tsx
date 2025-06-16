@@ -1,4 +1,6 @@
-import * as React from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+
+// Components & Icons
 import {
   Grid,
   ListItem,
@@ -13,22 +15,20 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  List,
+  Divider,
 } from "@mui/material";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
+import {
+  DashboardCustomize as DashboardCustomizeIcon,
+  Delete as DeleteIcon,
+  Favorite as FavoriteIcon,
+  Add as AddIcon,
+  Folder as FolderIcon,
+  Clear as ClearIcon,
+} from "@mui/icons-material";
+import { yellow, pink } from "@mui/material/colors";
 
-// Colors
-import { yellow } from "@mui/material/colors";
-import { pink } from "@mui/material/colors";
-
-//Icons
-import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import AddIcon from "@mui/icons-material/Add";
-import FolderIcon from "@mui/icons-material/Folder";
-import ClearIcon from "@mui/icons-material/Clear";
-
+// Custom Hooks & Styles
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import styles from "./MainView.module.scss";
 
@@ -36,10 +36,10 @@ const MainView = () => {
   const [folders, setFolders] = useLocalStorage("folders", [
     { id: 1, name: "folder placeholder" },
   ]);
-  const [open, setOpen] = React.useState(false);
-  const [folderName, setFolderName] = React.useState("");
-  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
-  const [folderToDelete, setFolderToDelete] = React.useState<null | {
+  const [open, setOpen] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState<null | {
     id: number;
     name: string;
   }>(null);
@@ -53,13 +53,11 @@ const MainView = () => {
     setFolderName("");
   };
 
-  const handleFolderNameChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFolderNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
   };
 
-  const handleAddFolder = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleAddFolder = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (folderName.trim()) {
       const newFolder = {
