@@ -25,6 +25,7 @@ import {
   Add as AddIcon,
   Folder as FolderIcon,
   Clear as ClearIcon,
+  Notes,
 } from "@mui/icons-material";
 import { yellow, pink } from "@mui/material/colors";
 
@@ -107,6 +108,14 @@ const MainView = () => {
                     <DashboardCustomizeIcon />
                   </ListItemIcon>
                   <ListItemText primary="Scratchpad" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <Notes />
+                  </ListItemIcon>
+                  <ListItemText primary="Notes" />
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
