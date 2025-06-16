@@ -1,0 +1,19 @@
+.mainView {
+  &__gridContainer {
+    height: 100dvh;
+  }
+
+  &__leftPanel {
+    height: 100%;
+    padding: 12px;
+    background-color: #2a2a2a;
+
+    &__logo {
+      color: white;
+    }
+  }
+
+  &__middlePanel {
+    background-color: #3f3f3f;
+  }
+}

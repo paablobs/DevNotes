@@ -1,7 +1,21 @@
-import styles from "./App.module.scss";
+import MainView from "./components/MainView/MainView";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 function App() {
-  return <div className={styles.wrapper}>hello vite 2</div>;
+  const theme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
+
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <MainView />
+      </ThemeProvider>
+    </>
+  );
 }
 
 export default App;
