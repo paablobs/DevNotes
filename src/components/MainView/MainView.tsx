@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
 } from "@mui/material";
 import List from "@mui/material/List";
 import { yellow } from "@mui/material/colors";
@@ -23,6 +24,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddIcon from "@mui/icons-material/Add";
 import FolderIcon from "@mui/icons-material/Folder";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import styles from "./MainView.module.scss";
@@ -59,6 +61,10 @@ const MainView = () => {
       setFolders([...folders, newFolder]);
     }
     handleClose();
+  };
+
+  const handleDeleteFolder = (id: number) => {
+    setFolders(folders.filter((folder) => folder.id !== id));
   };
 
   return (
@@ -105,7 +111,18 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               {folders.map((folder: { id: number; name: string }) => (
-                <ListItem key={folder.id}>
+                <ListItem
+                  key={folder.id}
+                  secondaryAction={
+                    <IconButton
+                      edge="end"
+                      onClick={() => handleDeleteFolder(folder.id)}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  }
+                  disablePadding
+                >
                   <ListItemButton>
                     <ListItemIcon>
                       <FolderIcon sx={{ color: yellow[500] }} />
