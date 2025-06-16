@@ -15,6 +15,9 @@ import {
   IconButton,
 } from "@mui/material";
 import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+
+// Colors
 import { yellow } from "@mui/material/colors";
 import { pink } from "@mui/material/colors";
 
@@ -132,6 +135,7 @@ const MainView = () => {
                   <ListItemText primary="Add Folder" />
                 </ListItemButton>
               </ListItem>
+              <Divider sx={{ margin: 2 }} />
               {folders.map((folder: { id: number; name: string }) => (
                 <ListItem
                   key={folder.id}
