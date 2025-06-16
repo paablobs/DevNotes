@@ -35,6 +35,11 @@ const MainView = () => {
   ]);
   const [open, setOpen] = React.useState(false);
   const [folderName, setFolderName] = React.useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [folderToDelete, setFolderToDelete] = React.useState<null | {
+    id: number;
+    name: string;
+  }>(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -61,6 +66,23 @@ const MainView = () => {
       setFolders([...folders, newFolder]);
     }
     handleClose();
+  };
+
+  const handleOpenDeleteDialog = (folder: { id: number; name: string }) => {
+    setFolderToDelete(folder);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setFolderToDelete(null);
+  };
+
+  const handleConfirmDeleteFolder = () => {
+    if (folderToDelete) {
+      handleDeleteFolder(folderToDelete.id);
+    }
+    handleCloseDeleteDialog();
   };
 
   const handleDeleteFolder = (id: number) => {
@@ -116,7 +138,8 @@ const MainView = () => {
                   secondaryAction={
                     <IconButton
                       edge="end"
-                      onClick={() => handleDeleteFolder(folder.id)}
+                      onClick={() => handleOpenDeleteDialog(folder)}
+                      aria-label="delete-folder"
                     >
                       <ClearIcon />
                     </IconButton>
@@ -171,6 +194,22 @@ const MainView = () => {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit">Add</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Delete Folder</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {`Are you sure you want to delete the folder "${
+              folderToDelete?.name ?? ""
+            }"? This action cannot be undone.`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+          <Button onClick={handleConfirmDeleteFolder} color="error">
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
