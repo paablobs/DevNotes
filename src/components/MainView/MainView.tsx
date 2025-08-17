@@ -28,6 +28,7 @@ import {
   Notes,
 } from "@mui/icons-material";
 import { yellow, pink } from "@mui/material/colors";
+import CustomCard from "../Card/Card";
 
 // Custom Hooks & Styles
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -90,6 +91,19 @@ const MainView = () => {
   const handleDeleteFolder = (id: number) => {
     setFolders(folders.filter((folder) => folder.id !== id));
   };
+
+  const cardExamples = [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
+    { key: "Card 2", title: "Card 2", text: "This is the second card." },
+    { key: "Card 3", title: "Card 3", text: "This is the third card." },
+    { key: "Card 4", title: "Card 4", text: "This is the fourth card." },
+    { key: "Card 5", title: "Card 5", text: "This is the fifth card." },
+    { key: "Card 6", title: "Card 6", text: "This is the sixth card." },
+    { key: "Card 7", title: "Card 7", text: "This is the seventh card." },
+    { key: "Card 8", title: "Card 8", text: "This is the eighth card." },
+    { key: "Card 9", title: "Card 9", text: "This is the ninth card." },
+    { key: "Card 10", title: "Card 10", text: "This is the tenth card." },
+  ];
 
   return (
     <div className={styles.mainView}>
@@ -169,7 +183,9 @@ const MainView = () => {
           </div>
         </Grid>
         <Grid width={300} className={styles.mainView__middlePanel}>
-          <h1>middle content</h1>
+          {cardExamples.map((card) => (
+            <CustomCard key={card.key} title={card.title} text={card.text} />
+          ))}
         </Grid>
         <Grid>
           <h1>textgrid area</h1>

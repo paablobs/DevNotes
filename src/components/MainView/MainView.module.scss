@@ -1,6 +1,7 @@
 .mainView {
   &__gridContainer {
     height: 100dvh;
+    display: flex;
   }
 
   &__leftPanel {
@@ -14,5 +15,8 @@
 
   &__middlePanel {
     background-color: #3f3f3f;
+    height: 100%;
+    width: 300px;
+    overflow: auto;
   }
 }
