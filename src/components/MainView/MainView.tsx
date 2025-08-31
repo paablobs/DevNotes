@@ -32,6 +32,9 @@ import CustomCard from "../Card/Card";
 
 // Custom Hooks & Styles
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { selectedView, type SelectedView } from "../../utils/selectedView";
+
+// styles
 import styles from "./MainView.module.scss";
 
 const MainView = () => {
@@ -45,6 +48,9 @@ const MainView = () => {
     id: number;
     name: string;
   }>(null);
+  const [currentView, setCurrentView] = useState<SelectedView>(
+    selectedView.SCRATCHPAD,
+  );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -92,7 +98,7 @@ const MainView = () => {
     setFolders(folders.filter((folder) => folder.id !== id));
   };
 
-  const cardExamples = [
+  const notesCardExamples = [
     { key: "Card 1", title: "Card 1", text: "This is the first card." },
     { key: "Card 2", title: "Card 2", text: "This is the second card." },
     { key: "Card 3", title: "Card 3", text: "This is the third card." },
@@ -103,6 +109,14 @@ const MainView = () => {
     { key: "Card 8", title: "Card 8", text: "This is the eighth card." },
     { key: "Card 9", title: "Card 9", text: "This is the ninth card." },
     { key: "Card 10", title: "Card 10", text: "This is the tenth card." },
+  ];
+
+  const favCardExamples = [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
+    { key: "Card 2", title: "Card 2", text: "This is the second card." },
+  ];
+  const trashCardExamples = [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
   ];
 
   return (
@@ -117,7 +131,10 @@ const MainView = () => {
                 </ListItemText>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton
+                  selected={currentView === selectedView.SCRATCHPAD}
+                  onClick={() => setCurrentView(selectedView.SCRATCHPAD)}
+                >
                   <ListItemIcon>
                     <DashboardCustomizeIcon />
                   </ListItemIcon>
@@ -125,7 +142,10 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton
+                  selected={currentView === selectedView.NOTES}
+                  onClick={() => setCurrentView(selectedView.NOTES)}
+                >
                   <ListItemIcon>
                     <Notes />
                   </ListItemIcon>
@@ -133,7 +153,10 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton
+                  selected={currentView === selectedView.FAVORITES}
+                  onClick={() => setCurrentView(selectedView.FAVORITES)}
+                >
                   <ListItemIcon>
                     <FavoriteIcon sx={{ color: pink[700] }} />
                   </ListItemIcon>
@@ -141,7 +164,10 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton
+                  selected={currentView === selectedView.TRASH}
+                  onClick={() => setCurrentView(selectedView.TRASH)}
+                >
                   <ListItemIcon>
                     <DeleteIcon />
                   </ListItemIcon>
@@ -182,11 +208,34 @@ const MainView = () => {
             </List>
           </div>
         </Grid>
-        <Grid width={300} className={styles.mainView__middlePanel}>
-          {cardExamples.map((card) => (
-            <CustomCard key={card.key} title={card.title} text={card.text} />
-          ))}
-        </Grid>
+        {currentView !== selectedView.SCRATCHPAD && (
+          <Grid width={300} className={styles.mainView__middlePanel}>
+            {currentView === selectedView.NOTES &&
+              notesCardExamples.map((card) => (
+                <CustomCard
+                  key={card.key}
+                  title={card.title}
+                  text={card.text}
+                />
+              ))}
+            {currentView === selectedView.FAVORITES &&
+              favCardExamples.map((card) => (
+                <CustomCard
+                  key={card.key}
+                  title={card.title}
+                  text={card.text}
+                />
+              ))}
+            {currentView === selectedView.TRASH &&
+              trashCardExamples.map((card) => (
+                <CustomCard
+                  key={card.key}
+                  title={card.title}
+                  text={card.text}
+                />
+              ))}
+          </Grid>
+        )}
         <Grid>
           <h1>textgrid area</h1>
         </Grid>
