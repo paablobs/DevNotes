@@ -45,6 +45,8 @@ interface Note {
   id: number;
   title: string;
   text: string;
+  isFav: boolean;
+  isTrash: boolean;
 }
 
 const MainView = () => {
@@ -123,6 +125,8 @@ const MainView = () => {
       id: generateId(),
       title: "Note title",
       text: "This is a new note.",
+      isFav: false,
+      isTrash: false,
     };
     setNotes([...notes, newNote]);
   };
@@ -138,6 +142,20 @@ const MainView = () => {
   const handleDeleteTrashNote = (id: number) => {
     deleteItemByIdFromLocalStorage(storageKeys.TRASH_NOTES, id);
     setTrashNotes(trashNotes.filter((note) => note.id !== id));
+  };
+
+  const handleFavNote = (id: number) => {
+    const note = notes.find((note) => note.id === id);
+    if (note) {
+      const updatedNote = { ...note, isFav: !note.isFav };
+      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
+      if (updatedNote.isFav) {
+        setFavNotes([...favNotes, updatedNote]);
+      } else {
+        deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
+        setFavNotes(favNotes.filter((n) => n.id !== id));
+      }
+    }
   };
 
   return (
@@ -212,7 +230,7 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <Divider sx={{ margin: 2 }} />
-              {folders.map((folder: { id: number; name: string }) => (
+              {folders.map((folder) => (
                 <ListItem
                   key={folder.id}
                   secondaryAction={
@@ -246,10 +264,11 @@ const MainView = () => {
                     <CustomCard
                       key={card.id}
                       id={card.id}
-                      storageKey={storageKeys.NOTES}
                       title={card.title}
                       text={card.text}
                       onDelete={handleDeleteNote}
+                      isFav={card.isFav}
+                      onFav={handleFavNote}
                     />
                   ),
               )}
@@ -260,11 +279,11 @@ const MainView = () => {
                     <CustomCard
                       key={card.id}
                       id={card.id}
-                      storageKey={storageKeys.FAV_NOTES}
                       title={card.title}
                       text={card.text}
-                      isFav
+                      isFav={card.isFav}
                       onDelete={handleDeleteFavNote}
+                      onFav={handleFavNote}
                     />
                   ),
               )}
@@ -275,10 +294,9 @@ const MainView = () => {
                     <CustomCard
                       key={card.id}
                       id={card.id}
-                      storageKey={storageKeys.TRASH_NOTES}
                       title={card.title}
                       text={card.text}
-                      isTrash
+                      isTrash={card.isTrash}
                       onDelete={handleDeleteTrashNote}
                     />
                   ),

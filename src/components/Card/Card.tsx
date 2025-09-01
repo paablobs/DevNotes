@@ -11,27 +11,26 @@ import {
   Restore as RestoreIcon,
   DeleteOutline as DeleteOutlineIcon,
 } from "@mui/icons-material";
-import { deleteItemByIdFromLocalStorage } from "../../utils/deleteItemByIdFromLocalStorage";
 
 interface CustomCardProps {
   id: number;
-  storageKey: string;
   title: string;
   text: string;
   isFav?: boolean;
   isTrash?: boolean;
   onDelete?: (id: number) => void;
+  onFav?: (id: number) => void;
 }
 
 const CustomCard = (
-  { id, storageKey, title, text, isFav, isTrash, onDelete }: CustomCardProps = {
+  { id, title, text, isFav, isTrash, onDelete, onFav }: CustomCardProps = {
     id: 0,
-    storageKey: "",
     title: "",
     text: "",
     isFav: false,
     isTrash: false,
     onDelete: undefined,
+    onFav: undefined,
   },
 ) => {
   return (
@@ -46,18 +45,10 @@ const CustomCard = (
         <CardActions>
           {!isTrash && (
             <>
-              <IconButton>
+              <IconButton onClick={onFav ? () => onFav(id) : undefined}>
                 <FavoriteIcon sx={isFav ? { color: pink[700] } : undefined} />
               </IconButton>
-              <IconButton
-                onClick={
-                  onDelete
-                    ? () => onDelete(id)
-                    : id !== undefined
-                      ? () => deleteItemByIdFromLocalStorage(storageKey, id)
-                      : undefined
-                }
-              >
+              <IconButton onClick={onDelete ? () => onDelete(id) : undefined}>
                 <DeleteOutlineIcon />
               </IconButton>
             </>
