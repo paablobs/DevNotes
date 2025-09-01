@@ -47,12 +47,19 @@ interface Note {
   text: string;
   isFav: boolean;
   isTrash: boolean;
+  folderId?: number;
+}
+
+interface Folders {
+  id: number;
+  name: string;
 }
 
 const MainView = () => {
-  const [folders, setFolders] = useLocalStorage(storageKeys.FOLDERS, [
-    { id: generateId(), name: "folder placeholder" },
-  ]);
+  const [folders, setFolders] = useLocalStorage<Folders[]>(
+    storageKeys.FOLDERS,
+    [],
+  );
   const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
   const [favNotes, setFavNotes] = useLocalStorage<Note[]>(
     storageKeys.FAV_NOTES,
@@ -73,6 +80,7 @@ const MainView = () => {
   const [currentView, setCurrentView] = useState<SelectedView>(
     selectedView.NOTES,
   );
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -94,7 +102,7 @@ const MainView = () => {
         id: generateId(),
         name: folderName.trim(),
       };
-      setFolders([...folders, newFolder]);
+      setFolders([newFolder, ...folders]);
     }
     handleClose();
   };
@@ -121,14 +129,28 @@ const MainView = () => {
   };
 
   const handleNewNote = () => {
-    const newNote = {
+    const newNote: Note = {
       id: generateId(),
       title: "Note title",
       text: "This is a new note.",
       isFav: false,
       isTrash: false,
+      ...(currentView === selectedView.FOLDERS && selectedFolderId
+        ? { folderId: selectedFolderId }
+        : {}),
     };
-    setNotes([...notes, newNote]);
+    if (currentView === selectedView.FOLDERS && selectedFolderId) {
+      setNotes([newNote, ...notes]);
+    } else if (currentView === selectedView.FAVORITES) {
+      newNote.isFav = true;
+      setNotes([newNote, ...notes]);
+      setFavNotes([newNote, ...favNotes]);
+    } else if (
+      currentView === selectedView.NOTES ||
+      currentView === selectedView.SCRATCHPAD
+    ) {
+      setNotes([newNote, ...notes]);
+    }
   };
 
   const handleFavNote = (id: number) => {
@@ -137,7 +159,7 @@ const MainView = () => {
       const updatedNote = { ...note, isFav: !note.isFav };
       setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
       if (updatedNote.isFav) {
-        setFavNotes([...favNotes, updatedNote]);
+        setFavNotes([updatedNote, ...favNotes]);
       } else {
         deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
         setFavNotes(favNotes.filter((n) => n.id !== id));
@@ -150,7 +172,7 @@ const MainView = () => {
     if (note) {
       const updatedNote = { ...note, isTrash: true };
       setNotes(notes.filter((n) => n.id !== id));
-      setTrashNotes([...trashNotes, updatedNote]);
+      setTrashNotes([updatedNote, ...trashNotes]);
       if (note.isFav) {
         deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
         setFavNotes(favNotes.filter((n) => n.id !== id));
@@ -163,9 +185,9 @@ const MainView = () => {
     if (note) {
       const restoredNote = { ...note, isTrash: false };
       setTrashNotes(trashNotes.filter((n) => n.id !== id));
-      setNotes([...notes, restoredNote]);
+      setNotes([restoredNote, ...notes, restoredNote]);
       if (note.isFav) {
-        setFavNotes([...favNotes, restoredNote]);
+        setFavNotes([restoredNote, ...favNotes]);
       }
     }
   };
@@ -226,7 +248,13 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={handleNewNote}>
+                <ListItemButton
+                  onClick={handleNewNote}
+                  disabled={
+                    currentView === selectedView.SCRATCHPAD ||
+                    currentView === selectedView.TRASH
+                  }
+                >
                   <ListItemIcon>
                     <AddIcon />
                   </ListItemIcon>
@@ -245,6 +273,7 @@ const MainView = () => {
               {folders.map((folder) => (
                 <ListItem
                   key={folder.id}
+                  disablePadding
                   secondaryAction={
                     <IconButton
                       edge="end"
@@ -254,9 +283,17 @@ const MainView = () => {
                       <ClearIcon />
                     </IconButton>
                   }
-                  disablePadding
                 >
-                  <ListItemButton>
+                  <ListItemButton
+                    selected={
+                      currentView === selectedView.FOLDERS &&
+                      selectedFolderId === folder.id
+                    }
+                    onClick={() => {
+                      setCurrentView(selectedView.FOLDERS);
+                      setSelectedFolderId(folder.id);
+                    }}
+                  >
                     <ListItemIcon>
                       <FolderIcon sx={{ color: yellow[500] }} />
                     </ListItemIcon>
@@ -299,6 +336,24 @@ const MainView = () => {
                     />
                   ),
               )}
+            {currentView === selectedView.FOLDERS &&
+              selectedFolderId &&
+              notes
+                .filter((note) => note.folderId === selectedFolderId)
+                .map(
+                  (card) =>
+                    card && (
+                      <CustomCard
+                        key={card.id}
+                        id={card.id}
+                        title={card.title}
+                        text={card.text}
+                        isFav={card.isFav}
+                        onFav={handleFavNote}
+                        onTrash={handleTrashNote}
+                      />
+                    ),
+                )}
             {currentView === selectedView.TRASH &&
               trashNotes.map(
                 (card) =>
