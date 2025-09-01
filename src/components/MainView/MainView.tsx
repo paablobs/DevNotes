@@ -41,6 +41,27 @@ const MainView = () => {
   const [folders, setFolders] = useLocalStorage("folders", [
     { id: 1, name: "folder placeholder" },
   ]);
+  const [notes] = useLocalStorage("notes", [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
+    { key: "Card 2", title: "Card 2", text: "This is the second card." },
+    { key: "Card 3", title: "Card 3", text: "This is the third card." },
+    { key: "Card 4", title: "Card 4", text: "This is the fourth card." },
+    { key: "Card 5", title: "Card 5", text: "This is the fifth card." },
+    { key: "Card 6", title: "Card 6", text: "This is the sixth card." },
+    { key: "Card 7", title: "Card 7", text: "This is the seventh card." },
+    { key: "Card 8", title: "Card 8", text: "This is the eighth card." },
+    { key: "Card 9", title: "Card 9", text: "This is the ninth card." },
+    { key: "Card 10", title: "Card 10", text: "This is the tenth card." },
+  ]);
+
+  const [favCards] = useLocalStorage("favCards", [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
+    { key: "Card 2", title: "Card 2", text: "This is the second card." },
+  ]);
+  const [trashCards] = useLocalStorage("trashCards", [
+    { key: "Card 1", title: "Card 1", text: "This is the first card." },
+  ]);
+
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -97,27 +118,6 @@ const MainView = () => {
   const handleDeleteFolder = (id: number) => {
     setFolders(folders.filter((folder) => folder.id !== id));
   };
-
-  const notesCardExamples = [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-    { key: "Card 2", title: "Card 2", text: "This is the second card." },
-    { key: "Card 3", title: "Card 3", text: "This is the third card." },
-    { key: "Card 4", title: "Card 4", text: "This is the fourth card." },
-    { key: "Card 5", title: "Card 5", text: "This is the fifth card." },
-    { key: "Card 6", title: "Card 6", text: "This is the sixth card." },
-    { key: "Card 7", title: "Card 7", text: "This is the seventh card." },
-    { key: "Card 8", title: "Card 8", text: "This is the eighth card." },
-    { key: "Card 9", title: "Card 9", text: "This is the ninth card." },
-    { key: "Card 10", title: "Card 10", text: "This is the tenth card." },
-  ];
-
-  const favCardExamples = [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-    { key: "Card 2", title: "Card 2", text: "This is the second card." },
-  ];
-  const trashCardExamples = [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-  ];
 
   return (
     <div className={styles.mainView}>
@@ -211,27 +211,32 @@ const MainView = () => {
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid width={300} className={styles.mainView__middlePanel}>
             {currentView === selectedView.NOTES &&
-              notesCardExamples.map((card) => (
-                <CustomCard
-                  key={card.key}
-                  title={card.title}
-                  text={card.text}
-                />
-              ))}
+              notes.map(
+                (card) =>
+                  card && (
+                    <CustomCard
+                      key={card.key}
+                      title={card.title}
+                      text={card.text}
+                    />
+                  ),
+              )}
             {currentView === selectedView.FAVORITES &&
-              favCardExamples.map((card) => (
+              favCards.map((card) => (
                 <CustomCard
                   key={card.key}
                   title={card.title}
                   text={card.text}
+                  isFav
                 />
               ))}
             {currentView === selectedView.TRASH &&
-              trashCardExamples.map((card) => (
+              trashCards.map((card) => (
                 <CustomCard
                   key={card.key}
                   title={card.title}
                   text={card.text}
+                  isTrash
                 />
               ))}
           </Grid>
