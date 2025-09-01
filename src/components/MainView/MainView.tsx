@@ -25,42 +25,41 @@ import {
   Add as AddIcon,
   Folder as FolderIcon,
   Clear as ClearIcon,
-  Notes,
+  Notes as NotesIcon,
+  CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
 import { yellow, pink } from "@mui/material/colors";
-import CustomCard from "../Card/Card";
 
-// Custom Hooks & Styles
+// Custom Hooks & Styles & Components
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
+import { storageKeys } from "../../utils/storageKeys";
+import CustomCard from "../Card/Card";
+import { deleteItemByIdFromLocalStorage } from "../../utils/deleteItemByIdFromLocalStorage";
+import { generateId } from "../../utils/generateId";
 
 // styles
 import styles from "./MainView.module.scss";
 
-const MainView = () => {
-  const [folders, setFolders] = useLocalStorage("folders", [
-    { id: 1, name: "folder placeholder" },
-  ]);
-  const [notes] = useLocalStorage("notes", [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-    { key: "Card 2", title: "Card 2", text: "This is the second card." },
-    { key: "Card 3", title: "Card 3", text: "This is the third card." },
-    { key: "Card 4", title: "Card 4", text: "This is the fourth card." },
-    { key: "Card 5", title: "Card 5", text: "This is the fifth card." },
-    { key: "Card 6", title: "Card 6", text: "This is the sixth card." },
-    { key: "Card 7", title: "Card 7", text: "This is the seventh card." },
-    { key: "Card 8", title: "Card 8", text: "This is the eighth card." },
-    { key: "Card 9", title: "Card 9", text: "This is the ninth card." },
-    { key: "Card 10", title: "Card 10", text: "This is the tenth card." },
-  ]);
+interface Note {
+  id: number;
+  title: string;
+  text: string;
+}
 
-  const [favCards] = useLocalStorage("favCards", [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-    { key: "Card 2", title: "Card 2", text: "This is the second card." },
+const MainView = () => {
+  const [folders, setFolders] = useLocalStorage(storageKeys.FOLDERS, [
+    { id: generateId(), name: "folder placeholder" },
   ]);
-  const [trashCards] = useLocalStorage("trashCards", [
-    { key: "Card 1", title: "Card 1", text: "This is the first card." },
-  ]);
+  const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
+  const [favNotes, setFavNotes] = useLocalStorage<Note[]>(
+    storageKeys.FAV_NOTES,
+    [],
+  );
+  const [trashNotes, setTrashNotes] = useLocalStorage<Note[]>(
+    storageKeys.TRASH_NOTES,
+    [],
+  );
 
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -70,7 +69,7 @@ const MainView = () => {
     name: string;
   }>(null);
   const [currentView, setCurrentView] = useState<SelectedView>(
-    selectedView.SCRATCHPAD,
+    selectedView.NOTES,
   );
 
   const handleClickOpen = () => {
@@ -90,7 +89,7 @@ const MainView = () => {
     event.preventDefault();
     if (folderName.trim()) {
       const newFolder = {
-        id: folders.length + 1,
+        id: generateId(),
         name: folderName.trim(),
       };
       setFolders([...folders, newFolder]);
@@ -117,6 +116,28 @@ const MainView = () => {
 
   const handleDeleteFolder = (id: number) => {
     setFolders(folders.filter((folder) => folder.id !== id));
+  };
+
+  const handleNewNote = () => {
+    const newNote = {
+      id: generateId(),
+      title: "Note title",
+      text: "This is a new note.",
+    };
+    setNotes([...notes, newNote]);
+  };
+
+  const handleDeleteNote = (id: number) => {
+    deleteItemByIdFromLocalStorage(storageKeys.NOTES, id);
+    setNotes(notes.filter((note) => note.id !== id));
+  };
+  const handleDeleteFavNote = (id: number) => {
+    deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
+    setFavNotes(favNotes.filter((note) => note.id !== id));
+  };
+  const handleDeleteTrashNote = (id: number) => {
+    deleteItemByIdFromLocalStorage(storageKeys.TRASH_NOTES, id);
+    setTrashNotes(trashNotes.filter((note) => note.id !== id));
   };
 
   return (
@@ -147,7 +168,7 @@ const MainView = () => {
                   onClick={() => setCurrentView(selectedView.NOTES)}
                 >
                   <ListItemIcon>
-                    <Notes />
+                    <NotesIcon />
                   </ListItemIcon>
                   <ListItemText primary="Notes" />
                 </ListItemButton>
@@ -175,11 +196,19 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={handleClickOpen}>
+                <ListItemButton onClick={handleNewNote}>
                   <ListItemIcon>
                     <AddIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Add Folder" />
+                  <ListItemText primary="New note" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleClickOpen}>
+                  <ListItemIcon>
+                    <CreateNewFolderIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Add folder" />
                 </ListItemButton>
               </ListItem>
               <Divider sx={{ margin: 2 }} />
@@ -209,73 +238,83 @@ const MainView = () => {
           </div>
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
-          <Grid width={300} className={styles.mainView__middlePanel}>
+          <Grid className={styles.mainView__middlePanel}>
             {currentView === selectedView.NOTES &&
               notes.map(
                 (card) =>
                   card && (
                     <CustomCard
-                      key={card.key}
+                      key={card.id}
+                      id={card.id}
+                      storageKey={storageKeys.NOTES}
                       title={card.title}
                       text={card.text}
+                      onDelete={handleDeleteNote}
                     />
                   ),
               )}
             {currentView === selectedView.FAVORITES &&
-              favCards.map((card) => (
-                <CustomCard
-                  key={card.key}
-                  title={card.title}
-                  text={card.text}
-                  isFav
-                />
-              ))}
+              favNotes.map(
+                (card) =>
+                  card && (
+                    <CustomCard
+                      key={card.id}
+                      id={card.id}
+                      storageKey={storageKeys.FAV_NOTES}
+                      title={card.title}
+                      text={card.text}
+                      isFav
+                      onDelete={handleDeleteFavNote}
+                    />
+                  ),
+              )}
             {currentView === selectedView.TRASH &&
-              trashCards.map((card) => (
-                <CustomCard
-                  key={card.key}
-                  title={card.title}
-                  text={card.text}
-                  isTrash
-                />
-              ))}
+              trashNotes.map(
+                (card) =>
+                  card && (
+                    <CustomCard
+                      key={card.id}
+                      id={card.id}
+                      storageKey={storageKeys.TRASH_NOTES}
+                      title={card.title}
+                      text={card.text}
+                      isTrash
+                      onDelete={handleDeleteTrashNote}
+                    />
+                  ),
+              )}
           </Grid>
         )}
         <Grid>
           <h1>textgrid area</h1>
         </Grid>
       </Grid>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          component: "form",
-          onSubmit: handleAddFolder,
-        }}
-      >
-        <DialogTitle>Add Folder</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter the name for the new folder.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="folderName"
-            name="folderName"
-            label="Folder Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={folderName}
-            onChange={handleFolderNameChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Add</Button>
-        </DialogActions>
+      <Dialog open={open} onClose={handleClose}>
+        <form onSubmit={handleAddFolder}>
+          <DialogTitle>Add Folder</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the name for the new folder.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="folderName"
+              name="folderName"
+              label="Folder Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={folderName}
+              onChange={handleFolderNameChange}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit">Add</Button>
+          </DialogActions>
+        </form>
       </Dialog>
       <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
         <DialogTitle>Delete Folder</DialogTitle>

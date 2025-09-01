@@ -14,9 +14,10 @@
   }
 
   &__middlePanel {
-    background-color: #3f3f3f;
     height: 100%;
-    width: 300px;
+    max-width: 400px;
+    flex: 1 1 auto;
+    background-color: #3f3f3f;
     overflow: auto;
   }
 }

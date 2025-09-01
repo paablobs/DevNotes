@@ -6,46 +6,71 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import { pink } from "@mui/material/colors";
 
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import RestoreIcon from "@mui/icons-material/Restore";
+import {
+  Favorite as FavoriteIcon,
+  Restore as RestoreIcon,
+  DeleteOutline as DeleteOutlineIcon,
+} from "@mui/icons-material";
+import { deleteItemByIdFromLocalStorage } from "../../utils/deleteItemByIdFromLocalStorage";
 
 interface CustomCardProps {
+  id: number;
+  storageKey: string;
   title: string;
   text: string;
   isFav?: boolean;
   isTrash?: boolean;
+  onDelete?: (id: number) => void;
 }
 
 const CustomCard = (
-  { title, text, isFav, isTrash }: CustomCardProps = {
+  { id, storageKey, title, text, isFav, isTrash, onDelete }: CustomCardProps = {
+    id: 0,
+    storageKey: "",
     title: "",
     text: "",
     isFav: false,
     isTrash: false,
+    onDelete: undefined,
   },
-) => (
-  <Box>
-    <Card variant="outlined">
-      <CardContent>
-        <Typography variant="h5" component="div">
-          {title}
-        </Typography>
-        <Typography variant="body2">{text}</Typography>
-      </CardContent>
-      <CardActions>
-        {!isTrash && (
-          <IconButton>
-            <FavoriteIcon sx={isFav ? { color: pink[700] } : undefined} />
-          </IconButton>
-        )}
-        {isTrash && (
-          <IconButton>
-            <RestoreIcon />
-          </IconButton>
-        )}
-      </CardActions>
-    </Card>
-  </Box>
-);
+) => {
+  return (
+    <Box>
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h5" component="div">
+            {title}
+          </Typography>
+          <Typography variant="body2">{text}</Typography>
+        </CardContent>
+        <CardActions>
+          {!isTrash && (
+            <>
+              <IconButton>
+                <FavoriteIcon sx={isFav ? { color: pink[700] } : undefined} />
+              </IconButton>
+              <IconButton
+                onClick={
+                  onDelete
+                    ? () => onDelete(id)
+                    : id !== undefined
+                      ? () => deleteItemByIdFromLocalStorage(storageKey, id)
+                      : undefined
+                }
+              >
+                <DeleteOutlineIcon />
+              </IconButton>
+            </>
+          )}
+          {isTrash && (
+            <IconButton>
+              <RestoreIcon />
+            </IconButton>
+          )}
+        </CardActions>
+      </Card>
+    </Box>
+  );
+};
 
 export default CustomCard;
