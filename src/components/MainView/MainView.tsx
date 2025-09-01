@@ -131,19 +131,6 @@ const MainView = () => {
     setNotes([...notes, newNote]);
   };
 
-  const handleDeleteNote = (id: number) => {
-    deleteItemByIdFromLocalStorage(storageKeys.NOTES, id);
-    setNotes(notes.filter((note) => note.id !== id));
-  };
-  const handleDeleteFavNote = (id: number) => {
-    deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
-    setFavNotes(favNotes.filter((note) => note.id !== id));
-  };
-  const handleDeleteTrashNote = (id: number) => {
-    deleteItemByIdFromLocalStorage(storageKeys.TRASH_NOTES, id);
-    setTrashNotes(trashNotes.filter((note) => note.id !== id));
-  };
-
   const handleFavNote = (id: number) => {
     const note = notes.find((note) => note.id === id);
     if (note) {
@@ -154,6 +141,31 @@ const MainView = () => {
       } else {
         deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
         setFavNotes(favNotes.filter((n) => n.id !== id));
+      }
+    }
+  };
+
+  const handleTrashNote = (id: number) => {
+    const note = notes.find((note) => note.id === id);
+    if (note) {
+      const updatedNote = { ...note, isTrash: true };
+      setNotes(notes.filter((n) => n.id !== id));
+      setTrashNotes([...trashNotes, updatedNote]);
+      if (note.isFav) {
+        deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
+        setFavNotes(favNotes.filter((n) => n.id !== id));
+      }
+    }
+  };
+
+  const handleRestoreNote = (id: number) => {
+    const note = trashNotes.find((n) => n.id === id);
+    if (note) {
+      const restoredNote = { ...note, isTrash: false };
+      setTrashNotes(trashNotes.filter((n) => n.id !== id));
+      setNotes([...notes, restoredNote]);
+      if (note.isFav) {
+        setFavNotes([...favNotes, restoredNote]);
       }
     }
   };
@@ -266,9 +278,9 @@ const MainView = () => {
                       id={card.id}
                       title={card.title}
                       text={card.text}
-                      onDelete={handleDeleteNote}
                       isFav={card.isFav}
                       onFav={handleFavNote}
+                      onTrash={handleTrashNote}
                     />
                   ),
               )}
@@ -282,8 +294,8 @@ const MainView = () => {
                       title={card.title}
                       text={card.text}
                       isFav={card.isFav}
-                      onDelete={handleDeleteFavNote}
                       onFav={handleFavNote}
+                      onTrash={handleTrashNote}
                     />
                   ),
               )}
@@ -297,7 +309,7 @@ const MainView = () => {
                       title={card.title}
                       text={card.text}
                       isTrash={card.isTrash}
-                      onDelete={handleDeleteTrashNote}
+                      onRestore={handleRestoreNote}
                     />
                   ),
               )}

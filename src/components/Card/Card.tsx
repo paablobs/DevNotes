@@ -18,19 +18,30 @@ interface CustomCardProps {
   text: string;
   isFav?: boolean;
   isTrash?: boolean;
-  onDelete?: (id: number) => void;
   onFav?: (id: number) => void;
+  onTrash?: (id: number) => void;
+  onRestore?: (id: number) => void;
 }
 
 const CustomCard = (
-  { id, title, text, isFav, isTrash, onDelete, onFav }: CustomCardProps = {
+  {
+    id,
+    title,
+    text,
+    isFav,
+    isTrash,
+    onFav,
+    onTrash,
+    onRestore,
+  }: CustomCardProps = {
     id: 0,
     title: "",
     text: "",
     isFav: false,
     isTrash: false,
-    onDelete: undefined,
     onFav: undefined,
+    onTrash: undefined,
+    onRestore: undefined,
   },
 ) => {
   return (
@@ -48,13 +59,13 @@ const CustomCard = (
               <IconButton onClick={onFav ? () => onFav(id) : undefined}>
                 <FavoriteIcon sx={isFav ? { color: pink[700] } : undefined} />
               </IconButton>
-              <IconButton onClick={onDelete ? () => onDelete(id) : undefined}>
+              <IconButton onClick={onTrash ? () => onTrash(id) : undefined}>
                 <DeleteOutlineIcon />
               </IconButton>
             </>
           )}
           {isTrash && (
-            <IconButton>
+            <IconButton onClick={onRestore ? () => onRestore(id) : undefined}>
               <RestoreIcon />
             </IconButton>
           )}
