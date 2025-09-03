@@ -36,7 +36,6 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
-import { deleteItemByIdFromLocalStorage } from "../../utils/deleteItemByIdFromLocalStorage";
 
 // styles
 import styles from "./MainView.module.scss";
@@ -61,14 +60,6 @@ const MainView = () => {
     [],
   );
   const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
-  const [favNotes, setFavNotes] = useLocalStorage<Note[]>(
-    storageKeys.FAV_NOTES,
-    [],
-  );
-  const [trashNotes, setTrashNotes] = useLocalStorage<Note[]>(
-    storageKeys.TRASH_NOTES,
-    [],
-  );
 
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -100,6 +91,7 @@ const MainView = () => {
         name: folderName.trim(),
       };
       setFolders([newFolder, ...folders]);
+      setFolderName("");
     }
     handleClose();
   };
@@ -123,6 +115,8 @@ const MainView = () => {
 
   const handleDeleteFolder = (id: string) => {
     setFolders(folders.filter((folder) => folder.id !== id));
+    setNotes(notes.filter((note) => note.folderId !== id));
+    setSelectedFolderId(null);
   };
 
   const handleNewNote = () => {
@@ -130,24 +124,13 @@ const MainView = () => {
       id: uuidv4(),
       title: "Note title",
       text: "This is a new note.",
-      isFav: false,
+      isFav: currentView === selectedView.FAVORITES,
       isTrash: false,
       ...(currentView === selectedView.FOLDERS && selectedFolderId
         ? { folderId: selectedFolderId }
         : {}),
     };
-    if (currentView === selectedView.FOLDERS && selectedFolderId) {
-      setNotes([newNote, ...notes]);
-    } else if (currentView === selectedView.FAVORITES) {
-      newNote.isFav = true;
-      setNotes([newNote, ...notes]);
-      setFavNotes([newNote, ...favNotes]);
-    } else if (
-      currentView === selectedView.NOTES ||
-      currentView === selectedView.SCRATCHPAD
-    ) {
-      setNotes([newNote, ...notes]);
-    }
+    setNotes([newNote, ...notes]);
   };
 
   const handleFavNote = (id: string) => {
@@ -155,12 +138,6 @@ const MainView = () => {
     if (note) {
       const updatedNote = { ...note, isFav: !note.isFav };
       setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
-      if (updatedNote.isFav) {
-        setFavNotes([updatedNote, ...favNotes]);
-      } else {
-        deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
-        setFavNotes(favNotes.filter((n) => n.id !== id));
-      }
     }
   };
 
@@ -168,24 +145,15 @@ const MainView = () => {
     const note = notes.find((note) => note.id === id);
     if (note) {
       const updatedNote = { ...note, isTrash: true };
-      setNotes(notes.filter((n) => n.id !== id));
-      setTrashNotes([updatedNote, ...trashNotes]);
-      if (note.isFav) {
-        deleteItemByIdFromLocalStorage(storageKeys.FAV_NOTES, id);
-        setFavNotes(favNotes.filter((n) => n.id !== id));
-      }
+      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
     }
   };
 
   const handleRestoreNote = (id: string) => {
-    const note = trashNotes.find((n) => n.id === id);
+    const note = notes.find((n) => n.id === id && n.isTrash);
     if (note) {
       const restoredNote = { ...note, isTrash: false };
-      setTrashNotes(trashNotes.filter((n) => n.id !== id));
-      setNotes([restoredNote, ...notes]);
-      if (note.isFav) {
-        setFavNotes([restoredNote, ...favNotes]);
-      }
+      setNotes(notes.map((n) => (n.id === id ? restoredNote : n)));
     }
   };
 
@@ -304,39 +272,45 @@ const MainView = () => {
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid className={styles.mainView__middlePanel}>
             {currentView === selectedView.NOTES &&
-              notes.map(
-                (card) =>
-                  card && (
-                    <CustomCard
-                      key={card.id}
-                      id={card.id}
-                      title={card.title}
-                      text={card.text}
-                      isFav={card.isFav}
-                      onFav={handleFavNote}
-                      onTrash={handleTrashNote}
-                    />
-                  ),
-              )}
+              notes
+                .filter((card) => !card.isTrash)
+                .map(
+                  (card) =>
+                    card && (
+                      <CustomCard
+                        key={card.id}
+                        id={card.id}
+                        title={card.title}
+                        text={card.text}
+                        isFav={card.isFav}
+                        onFav={handleFavNote}
+                        onTrash={handleTrashNote}
+                      />
+                    ),
+                )}
             {currentView === selectedView.FAVORITES &&
-              favNotes.map(
-                (card) =>
-                  card && (
-                    <CustomCard
-                      key={card.id}
-                      id={card.id}
-                      title={card.title}
-                      text={card.text}
-                      isFav={card.isFav}
-                      onFav={handleFavNote}
-                      onTrash={handleTrashNote}
-                    />
-                  ),
-              )}
+              notes
+                .filter((card) => card.isFav && !card.isTrash)
+                .map(
+                  (card) =>
+                    card && (
+                      <CustomCard
+                        key={card.id}
+                        id={card.id}
+                        title={card.title}
+                        text={card.text}
+                        isFav={card.isFav}
+                        onFav={handleFavNote}
+                        onTrash={handleTrashNote}
+                      />
+                    ),
+                )}
             {currentView === selectedView.FOLDERS &&
               selectedFolderId &&
               notes
-                .filter((note) => note.folderId === selectedFolderId)
+                .filter(
+                  (note) => note.folderId === selectedFolderId && !note.isTrash,
+                )
                 .map(
                   (card) =>
                     card && (
@@ -352,19 +326,21 @@ const MainView = () => {
                     ),
                 )}
             {currentView === selectedView.TRASH &&
-              trashNotes.map(
-                (card) =>
-                  card && (
-                    <CustomCard
-                      key={card.id}
-                      id={card.id}
-                      title={card.title}
-                      text={card.text}
-                      isTrash={card.isTrash}
-                      onRestore={handleRestoreNote}
-                    />
-                  ),
-              )}
+              notes
+                .filter((card) => card.isTrash)
+                .map(
+                  (card) =>
+                    card && (
+                      <CustomCard
+                        key={card.id}
+                        id={card.id}
+                        title={card.title}
+                        text={card.text}
+                        isTrash={card.isTrash}
+                        onRestore={handleRestoreNote}
+                      />
+                    ),
+                )}
           </Grid>
         )}
         <Grid>
