@@ -28,7 +28,7 @@ import {
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
-import { yellow, pink } from "@mui/material/colors";
+import { yellow, pink, green } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
@@ -213,20 +213,6 @@ const MainView = () => {
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton
-                  onClick={handleNewNote}
-                  disabled={
-                    currentView === selectedView.SCRATCHPAD ||
-                    currentView === selectedView.TRASH
-                  }
-                >
-                  <ListItemIcon>
-                    <AddIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="New note" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
                 <ListItemButton onClick={handleClickOpen}>
                   <ListItemIcon>
                     <CreateNewFolderIcon />
@@ -271,6 +257,21 @@ const MainView = () => {
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid className={styles.mainView__middlePanel}>
+            {currentView !== selectedView.TRASH && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={handleNewNote}
+                  disabled={currentView === selectedView.SCRATCHPAD}
+                  divider
+                  sx={{ bgcolor: green[900] }}
+                >
+                  <ListItemIcon>
+                    <AddIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="New note" />
+                </ListItemButton>
+              </ListItem>
+            )}
             {currentView === selectedView.NOTES &&
               notes
                 .filter((card) => !card.isTrash)
