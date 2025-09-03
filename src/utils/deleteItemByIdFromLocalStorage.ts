@@ -1,7 +1,7 @@
 // Elimina un objeto por id dentro de un array almacenado en localStorage bajo una key dada
-export function deleteItemByIdFromLocalStorage<T extends { id: number }>(
+export function deleteItemByIdFromLocalStorage<T extends { id: string }>(
   key: string,
-  id: number,
+  id: string,
 ) {
   const data = localStorage.getItem(key);
   if (!data) return;

@@ -13,14 +13,14 @@ import {
 } from "@mui/icons-material";
 
 interface CustomCardProps {
-  id: number;
+  id: string;
   title: string;
   text: string;
   isFav?: boolean;
   isTrash?: boolean;
-  onFav?: (id: number) => void;
-  onTrash?: (id: number) => void;
-  onRestore?: (id: number) => void;
+  onFav?: (id: string) => void;
+  onTrash?: (id: string) => void;
+  onRestore?: (id: string) => void;
 }
 
 const CustomCard = (
@@ -34,7 +34,7 @@ const CustomCard = (
     onTrash,
     onRestore,
   }: CustomCardProps = {
-    id: 0,
+    id: "",
     title: "",
     text: "",
     isFav: false,

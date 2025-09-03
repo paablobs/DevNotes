@@ -29,6 +29,7 @@ import {
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
 import { yellow, pink } from "@mui/material/colors";
+import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -36,27 +37,26 @@ import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
 import { deleteItemByIdFromLocalStorage } from "../../utils/deleteItemByIdFromLocalStorage";
-import { generateId } from "../../utils/generateId";
 
 // styles
 import styles from "./MainView.module.scss";
 
 interface Note {
-  id: number;
+  id: string;
   title: string;
   text: string;
   isFav: boolean;
   isTrash: boolean;
-  folderId?: number;
+  folderId?: string;
 }
 
-interface Folders {
-  id: number;
+interface Folder {
+  id: string;
   name: string;
 }
 
 const MainView = () => {
-  const [folders, setFolders] = useLocalStorage<Folders[]>(
+  const [folders, setFolders] = useLocalStorage<Folder[]>(
     storageKeys.FOLDERS,
     [],
   );
@@ -73,14 +73,11 @@ const MainView = () => {
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [folderToDelete, setFolderToDelete] = useState<null | {
-    id: number;
-    name: string;
-  }>(null);
+  const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
   const [currentView, setCurrentView] = useState<SelectedView>(
     selectedView.NOTES,
   );
-  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -98,8 +95,8 @@ const MainView = () => {
   const handleAddFolder = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (folderName.trim()) {
-      const newFolder = {
-        id: generateId(),
+      const newFolder: Folder = {
+        id: uuidv4(),
         name: folderName.trim(),
       };
       setFolders([newFolder, ...folders]);
@@ -107,7 +104,7 @@ const MainView = () => {
     handleClose();
   };
 
-  const handleOpenDeleteDialog = (folder: { id: number; name: string }) => {
+  const handleOpenDeleteDialog = (folder: Folder) => {
     setFolderToDelete(folder);
     setOpenDeleteDialog(true);
   };
@@ -124,13 +121,13 @@ const MainView = () => {
     handleCloseDeleteDialog();
   };
 
-  const handleDeleteFolder = (id: number) => {
+  const handleDeleteFolder = (id: string) => {
     setFolders(folders.filter((folder) => folder.id !== id));
   };
 
   const handleNewNote = () => {
     const newNote: Note = {
-      id: generateId(),
+      id: uuidv4(),
       title: "Note title",
       text: "This is a new note.",
       isFav: false,
@@ -153,7 +150,7 @@ const MainView = () => {
     }
   };
 
-  const handleFavNote = (id: number) => {
+  const handleFavNote = (id: string) => {
     const note = notes.find((note) => note.id === id);
     if (note) {
       const updatedNote = { ...note, isFav: !note.isFav };
@@ -167,7 +164,7 @@ const MainView = () => {
     }
   };
 
-  const handleTrashNote = (id: number) => {
+  const handleTrashNote = (id: string) => {
     const note = notes.find((note) => note.id === id);
     if (note) {
       const updatedNote = { ...note, isTrash: true };
@@ -180,12 +177,12 @@ const MainView = () => {
     }
   };
 
-  const handleRestoreNote = (id: number) => {
+  const handleRestoreNote = (id: string) => {
     const note = trashNotes.find((n) => n.id === id);
     if (note) {
       const restoredNote = { ...note, isTrash: false };
       setTrashNotes(trashNotes.filter((n) => n.id !== id));
-      setNotes([restoredNote, ...notes, restoredNote]);
+      setNotes([restoredNote, ...notes]);
       if (note.isFav) {
         setFavNotes([restoredNote, ...favNotes]);
       }
