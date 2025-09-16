@@ -21,6 +21,7 @@ interface CustomCardProps {
   onFav?: (id: string) => void;
   onTrash?: (id: string) => void;
   onRestore?: (id: string) => void;
+  onSelect?: (id: string) => void;
 }
 
 const CustomCard = (
@@ -33,6 +34,7 @@ const CustomCard = (
     onFav,
     onTrash,
     onRestore,
+    onSelect,
   }: CustomCardProps = {
     id: "",
     title: "",
@@ -42,16 +44,30 @@ const CustomCard = (
     onFav: undefined,
     onTrash: undefined,
     onRestore: undefined,
+    onSelect: undefined,
   },
 ) => {
   return (
-    <Box>
-      <Card variant="outlined">
+    <Box sx={{ maxHeight: 142 }}>
+      <Card
+        variant="outlined"
+        onClick={onSelect ? () => onSelect(id) : undefined}
+        sx={{ cursor: onSelect ? "pointer" : undefined, maxHeight: 142 }}
+      >
         <CardContent>
           <Typography variant="h5" component="div">
             {title}
           </Typography>
-          <Typography variant="body2">{text}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {text}
+          </Typography>
         </CardContent>
         <CardActions>
           {!isTrash && (

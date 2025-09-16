@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 
 // Components & Icons
 import {
@@ -69,6 +69,33 @@ const MainView = () => {
     selectedView.NOTES,
   );
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
+    "SCRATCHPAD_VALUE",
+    "",
+  );
+
+  const getSelectedNote = () =>
+    notes.find((n) => n.id === selectedNoteId) || null;
+
+  const getTextAreaValue = () => {
+    if (currentView === selectedView.SCRATCHPAD) return scratchpadValue;
+    const note = getSelectedNote();
+    return note ? note.text : "";
+  };
+
+  const [textAreaValue, setTextAreaValue] = useState(getTextAreaValue());
+
+  useEffect(() => {
+    if (currentView !== selectedView.SCRATCHPAD) {
+      setSelectedNoteId(null);
+    }
+    setTextAreaValue(getTextAreaValue());
+  }, [currentView]);
+
+  useEffect(() => {
+    setTextAreaValue(getTextAreaValue());
+  }, [selectedNoteId, notes, scratchpadValue]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -154,6 +181,19 @@ const MainView = () => {
     if (note) {
       const restoredNote = { ...note, isTrash: false };
       setNotes(notes.map((n) => (n.id === id ? restoredNote : n)));
+    }
+  };
+
+  const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setTextAreaValue(e.target.value);
+    if (currentView === selectedView.SCRATCHPAD) {
+      setScratchpadValue(e.target.value);
+    } else if (selectedNoteId) {
+      setNotes(
+        notes.map((n) =>
+          n.id === selectedNoteId ? { ...n, text: e.target.value } : n,
+        ),
+      );
     }
   };
 
@@ -256,7 +296,7 @@ const MainView = () => {
           </div>
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
-          <Grid className={styles.mainView__middlePanel}>
+          <Grid maxWidth={400} className={styles.mainView__middlePanel}>
             {currentView !== selectedView.TRASH && (
               <ListItem disablePadding>
                 <ListItemButton
@@ -286,6 +326,7 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onSelect={setSelectedNoteId}
                       />
                     ),
                 )}
@@ -303,6 +344,7 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onSelect={setSelectedNoteId}
                       />
                     ),
                 )}
@@ -323,6 +365,7 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onSelect={setSelectedNoteId}
                       />
                     ),
                 )}
@@ -344,9 +387,28 @@ const MainView = () => {
                 )}
           </Grid>
         )}
-        <Grid>
-          <h1>textgrid area</h1>
-        </Grid>
+        {(currentView === selectedView.SCRATCHPAD ||
+          (selectedNoteId &&
+            (currentView === selectedView.NOTES ||
+              currentView === selectedView.FAVORITES ||
+              currentView === selectedView.FOLDERS))) && (
+          <Grid className={styles.mainView__rightPanel}>
+            <textarea
+              name="notero"
+              value={textAreaValue}
+              onChange={handleTextAreaChange}
+              style={{
+                resize: "none",
+                width: "100%",
+                height: "calc(100% - 2px)",
+                fontSize: 16,
+                fontFamily: "inherit",
+                background: "#fff",
+                color: "#222",
+              }}
+            />
+          </Grid>
+        )}
       </Grid>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={handleAddFolder}>
