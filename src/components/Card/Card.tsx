@@ -16,8 +16,8 @@ import styles from "./Card.module.scss";
 
 interface CustomCardProps {
   id: string;
-  title: string;
   text: string;
+  category: string;
   isFav?: boolean;
   isTrash?: boolean;
   onFav?: (id: string) => void;
@@ -26,29 +26,17 @@ interface CustomCardProps {
   onSelect?: (id: string) => void;
 }
 
-const CustomCard = (
-  {
-    id,
-    title,
-    text,
-    isFav,
-    isTrash,
-    onFav,
-    onTrash,
-    onRestore,
-    onSelect,
-  }: CustomCardProps = {
-    id: "",
-    title: "",
-    text: "",
-    isFav: false,
-    isTrash: false,
-    onFav: undefined,
-    onTrash: undefined,
-    onRestore: undefined,
-    onSelect: undefined,
-  },
-) => {
+const CustomCard = ({
+  id,
+  text,
+  category,
+  isFav,
+  isTrash,
+  onFav,
+  onTrash,
+  onRestore,
+  onSelect,
+}: CustomCardProps) => {
   return (
     <Box className={styles.box}>
       <Card
@@ -58,10 +46,10 @@ const CustomCard = (
       >
         <CardContent>
           <Typography variant="h5" component="div" className={styles.box__text}>
-            {title}
+            {text}
           </Typography>
           <Typography variant="body2" className={styles.box__text}>
-            {text}
+            {category}
           </Typography>
         </CardContent>
         <CardActions>

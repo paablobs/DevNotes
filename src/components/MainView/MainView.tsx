@@ -42,8 +42,8 @@ import styles from "./MainView.module.scss";
 
 interface Note {
   id: string;
-  title: string;
   text: string;
+  category: string;
   isFav: boolean;
   isTrash: boolean;
   folderId?: string;
@@ -147,10 +147,15 @@ const MainView = () => {
   };
 
   const handleNewNote = () => {
+    let category = "Notes";
+    if (currentView === selectedView.FOLDERS && selectedFolderId) {
+      const folder = folders.find((f) => f.id === selectedFolderId);
+      if (folder) category = folder.name;
+    }
     const newNote: Note = {
       id: uuidv4(),
-      title: "Note title",
-      text: "This is a new note.",
+      text: "",
+      category,
       isFav: currentView === selectedView.FAVORITES,
       isTrash: false,
       ...(currentView === selectedView.FOLDERS && selectedFolderId
@@ -185,14 +190,13 @@ const MainView = () => {
   };
 
   const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setTextAreaValue(e.target.value);
+    const value = e.target.value;
+    setTextAreaValue(value);
     if (currentView === selectedView.SCRATCHPAD) {
-      setScratchpadValue(e.target.value);
+      setScratchpadValue(value);
     } else if (selectedNoteId) {
       setNotes(
-        notes.map((n) =>
-          n.id === selectedNoteId ? { ...n, text: e.target.value } : n,
-        ),
+        notes.map((n) => (n.id === selectedNoteId ? { ...n, text: value } : n)),
       );
     }
   };
@@ -321,8 +325,8 @@ const MainView = () => {
                       <CustomCard
                         key={card.id}
                         id={card.id}
-                        title={card.title}
                         text={card.text}
+                        category={card.category}
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
@@ -339,8 +343,8 @@ const MainView = () => {
                       <CustomCard
                         key={card.id}
                         id={card.id}
-                        title={card.title}
                         text={card.text}
+                        category={card.category}
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
@@ -360,8 +364,8 @@ const MainView = () => {
                       <CustomCard
                         key={card.id}
                         id={card.id}
-                        title={card.title}
                         text={card.text}
+                        category={card.category}
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
@@ -378,8 +382,8 @@ const MainView = () => {
                       <CustomCard
                         key={card.id}
                         id={card.id}
-                        title={card.title}
                         text={card.text}
+                        category={card.category}
                         isTrash={card.isTrash}
                         onRestore={handleRestoreNote}
                       />
