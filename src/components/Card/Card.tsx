@@ -12,6 +12,8 @@ import {
   DeleteOutline as DeleteOutlineIcon,
 } from "@mui/icons-material";
 
+import styles from "./Card.module.scss";
+
 interface CustomCardProps {
   id: string;
   title: string;
@@ -48,24 +50,17 @@ const CustomCard = (
   },
 ) => {
   return (
-    <Box sx={{ maxHeight: 142 }}>
+    <Box className={styles.box}>
       <Card
+        className={styles.box__card}
         variant="outlined"
         onClick={onSelect ? () => onSelect(id) : undefined}
-        sx={{ cursor: onSelect ? "pointer" : undefined, maxHeight: 142 }}
       >
         <CardContent>
-          <Typography variant="h5" component="div">
+          <Typography variant="h5" component="div" className={styles.box__text}>
             {title}
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
+          <Typography variant="body2" className={styles.box__text}>
             {text}
           </Typography>
         </CardContent>
