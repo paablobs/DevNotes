@@ -21,14 +21,14 @@ import {
 import {
   DashboardCustomize as DashboardCustomizeIcon,
   Delete as DeleteIcon,
-  Favorite as FavoriteIcon,
+  Star as StarIcon,
   Add as AddIcon,
   Folder as FolderIcon,
   Clear as ClearIcon,
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
-import { yellow, pink, green, red } from "@mui/material/colors";
+import { yellow, green, red } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
@@ -240,7 +240,7 @@ const MainView = () => {
                   onClick={() => setCurrentView(selectedView.FAVORITES)}
                 >
                   <ListItemIcon>
-                    <FavoriteIcon sx={{ color: pink[700] }} />
+                    <StarIcon sx={{ color: yellow[700] }} />
                   </ListItemIcon>
                   <ListItemText primary="Favorites" />
                 </ListItemButton>

@@ -4,10 +4,11 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { pink } from "@mui/material/colors";
+import { yellow } from "@mui/material/colors";
 
 import {
-  Favorite as FavoriteIcon,
+  Star as StarIcon,
+  StarBorder as StarredIcon,
   Restore as RestoreIcon,
   DeleteOutline as DeleteOutlineIcon,
 } from "@mui/icons-material";
@@ -56,7 +57,11 @@ const CustomCard = ({
           {!isTrash && (
             <>
               <IconButton onClick={onFav ? () => onFav(id) : undefined}>
-                <FavoriteIcon sx={isFav ? { color: pink[700] } : undefined} />
+                {isFav ? (
+                  <StarIcon sx={{ color: yellow[700] }} />
+                ) : (
+                  <StarredIcon />
+                )}
               </IconButton>
               <IconButton onClick={onTrash ? () => onTrash(id) : undefined}>
                 <DeleteOutlineIcon />
