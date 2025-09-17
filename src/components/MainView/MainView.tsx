@@ -147,7 +147,7 @@ const MainView = () => {
   };
 
   const handleNewNote = () => {
-    let category = "Notes";
+    let category = "All notes";
     if (currentView === selectedView.FOLDERS && selectedFolderId) {
       const folder = folders.find((f) => f.id === selectedFolderId);
       if (folder) category = folder.name;
@@ -231,7 +231,7 @@ const MainView = () => {
                   <ListItemIcon>
                     <NotesIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Notes" />
+                  <ListItemText primary="All notes" />
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
