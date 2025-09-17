@@ -209,7 +209,7 @@ const MainView = () => {
             <List>
               <ListItem>
                 <ListItemText className={styles.mainView__leftPanel__logo}>
-                  Notero
+                  DevNotes
                 </ListItemText>
               </ListItem>
               <ListItem disablePadding>
@@ -398,7 +398,7 @@ const MainView = () => {
               currentView === selectedView.FOLDERS))) && (
           <Grid className={styles.mainView__rightPanel}>
             <textarea
-              name="notero"
+              name="Dev Notes Text Area"
               value={textAreaValue}
               onChange={handleTextAreaChange}
               style={{
