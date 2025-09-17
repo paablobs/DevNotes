@@ -71,7 +71,7 @@ const MainView = () => {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
-    "SCRATCHPAD_VALUE",
+    "scratchpad",
     "",
   );
 
