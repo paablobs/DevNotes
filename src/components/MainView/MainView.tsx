@@ -404,9 +404,9 @@ const MainView = () => {
               style={{
                 resize: "none",
                 width: "100%",
-                height: "calc(100% - 2px)",
+                height: "100%",
                 fontSize: 16,
-                fontFamily: "inherit",
+                fontFamily: "monospace",
                 background: "#333",
                 color: "#fff",
               }}
