@@ -416,15 +416,7 @@ const MainView = () => {
               name="Dev Notes Text Area"
               value={textAreaValue}
               onChange={handleTextAreaChange}
-              style={{
-                resize: "none",
-                width: "100%",
-                height: "100%",
-                fontSize: 16,
-                fontFamily: "monospace",
-                background: "#333",
-                color: "#fff",
-              }}
+              className={styles.mainView__editor}
             />
           </Grid>
         )}
