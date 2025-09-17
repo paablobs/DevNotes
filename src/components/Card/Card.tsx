@@ -46,7 +46,7 @@ const CustomCard = ({
       >
         <CardContent>
           <Typography variant="h5" component="div" className={styles.box__text}>
-            {(text.match(/^(.*\S.*)$/m) || [""])[0]}
+            {(text.match(/^(.*\S.*)$/m) || ["New note"])[0]}
           </Typography>
           <Typography variant="body2" className={styles.box__text}>
             {category}
