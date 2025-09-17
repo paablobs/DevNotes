@@ -28,7 +28,7 @@ import {
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
-import { yellow, pink, green } from "@mui/material/colors";
+import { yellow, pink, green, red } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
@@ -373,22 +373,37 @@ const MainView = () => {
                       />
                     ),
                 )}
-            {currentView === selectedView.TRASH &&
-              notes
-                .filter((card) => card.isTrash)
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isTrash={card.isTrash}
-                        onRestore={handleRestoreNote}
-                      />
-                    ),
-                )}
+            {currentView === selectedView.TRASH && (
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => setNotes(notes.filter((n) => !n.isTrash))}
+                    divider
+                    sx={{ bgcolor: red[900] }}
+                  >
+                    <ListItemIcon>
+                      <DeleteIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Empty Trash" />
+                  </ListItemButton>
+                </ListItem>
+                {notes
+                  .filter((card) => card.isTrash)
+                  .map(
+                    (card) =>
+                      card && (
+                        <CustomCard
+                          key={card.id}
+                          id={card.id}
+                          text={card.text}
+                          category={card.category}
+                          isTrash={card.isTrash}
+                          onRestore={handleRestoreNote}
+                        />
+                      ),
+                  )}
+              </>
+            )}
           </Grid>
         )}
         {(currentView === selectedView.SCRATCHPAD ||
