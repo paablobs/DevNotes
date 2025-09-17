@@ -407,8 +407,8 @@ const MainView = () => {
                 height: "calc(100% - 2px)",
                 fontSize: 16,
                 fontFamily: "inherit",
-                background: "#fff",
-                color: "#222",
+                background: "#333",
+                color: "#fff",
               }}
             />
           </Grid>
