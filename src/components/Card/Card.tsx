@@ -25,6 +25,7 @@ interface CustomCardProps {
   onTrash?: (id: string) => void;
   onRestore?: (id: string) => void;
   onSelect?: (id: string) => void;
+  selected?: boolean;
 }
 
 const CustomCard = ({
@@ -37,6 +38,7 @@ const CustomCard = ({
   onTrash,
   onRestore,
   onSelect,
+  selected,
 }: CustomCardProps) => {
   return (
     <Box className={styles.box}>
@@ -44,6 +46,7 @@ const CustomCard = ({
         className={styles.box__card}
         variant="outlined"
         onClick={onSelect ? () => onSelect(id) : undefined}
+        data-active={selected ? "true" : undefined}
       >
         <CardContent>
           <Typography variant="h5" component="div" className={styles.box__text}>

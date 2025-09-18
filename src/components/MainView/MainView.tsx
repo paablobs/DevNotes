@@ -346,6 +346,7 @@ const MainView = () => {
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
                         onSelect={setSelectedNoteId}
+                        selected={selectedNoteId === card.id}
                       />
                     ),
                 )}
@@ -364,6 +365,7 @@ const MainView = () => {
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
                         onSelect={setSelectedNoteId}
+                        selected={selectedNoteId === card.id}
                       />
                     ),
                 )}
@@ -385,6 +387,7 @@ const MainView = () => {
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
                         onSelect={setSelectedNoteId}
+                        selected={selectedNoteId === card.id}
                       />
                     ),
                 )}
@@ -415,6 +418,7 @@ const MainView = () => {
                           isTrash={card.isTrash}
                           onRestore={handleRestoreNote}
                           onSelect={setSelectedNoteId}
+                          selected={selectedNoteId === card.id}
                         />
                       ),
                   )}

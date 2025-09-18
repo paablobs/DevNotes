@@ -5,6 +5,10 @@
   &__card {
     height: 100%;
     cursor: pointer;
+
+    &[data-active="true"] {
+      background-color: grey;
+    }
   }
 
   &__text {
