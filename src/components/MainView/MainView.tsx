@@ -71,6 +71,7 @@ const MainView = () => {
   const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
+  const [openEmptyTrashDialog, setOpenEmptyTrashDialog] = useState(false);
   const [currentView, setCurrentView] = useState<SelectedView>(
     selectedView.NOTES,
   );
@@ -395,7 +396,7 @@ const MainView = () => {
               <>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => setNotes(notes.filter((n) => !n.isTrash))}
+                    onClick={() => setOpenEmptyTrashDialog(true)}
                     divider
                     sx={{ bgcolor: red[900] }}
                   >
@@ -485,6 +486,30 @@ const MainView = () => {
           <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
           <Button onClick={handleConfirmDeleteFolder} color="error">
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openEmptyTrashDialog}
+        onClose={() => setOpenEmptyTrashDialog(false)}
+      >
+        <DialogTitle>Empty Trash</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to permanently delete all notes in the trash?
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEmptyTrashDialog(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setNotes(notes.filter((n) => !n.isTrash));
+              setOpenEmptyTrashDialog(false);
+            }}
+            color="error"
+          >
+            Empty Trash
           </Button>
         </DialogActions>
       </Dialog>
