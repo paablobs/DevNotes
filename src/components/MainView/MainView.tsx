@@ -414,6 +414,7 @@ const MainView = () => {
                           category={card.category}
                           isTrash={card.isTrash}
                           onRestore={handleRestoreNote}
+                          onSelect={setSelectedNoteId}
                         />
                       ),
                   )}
@@ -425,7 +426,8 @@ const MainView = () => {
           (selectedNoteId &&
             (currentView === selectedView.NOTES ||
               currentView === selectedView.FAVORITES ||
-              currentView === selectedView.FOLDERS))) && (
+              currentView === selectedView.FOLDERS ||
+              currentView === selectedView.TRASH))) && (
           <Grid className={styles.mainView__rightPanel}>
             <textarea
               ref={textAreaRef}
@@ -433,6 +435,7 @@ const MainView = () => {
               value={textAreaValue}
               onChange={handleTextAreaChange}
               className={styles.mainView__editor}
+              disabled={currentView === selectedView.TRASH}
             />
           </Grid>
         )}
