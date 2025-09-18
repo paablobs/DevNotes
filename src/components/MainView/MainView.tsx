@@ -78,7 +78,7 @@ const MainView = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
     "scratchpad",
-    "",
+    "Welcome to DevNotes!\n\nThis is your scratchpad. You can jot down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
   );
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -436,6 +436,7 @@ const MainView = () => {
               onChange={handleTextAreaChange}
               className={styles.mainView__editor}
               disabled={currentView === selectedView.TRASH}
+              autoFocus
             />
           </Grid>
         )}
