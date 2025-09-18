@@ -1,4 +1,10 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
+import {
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+} from "react";
 
 // Components & Icons
 import {
@@ -75,6 +81,8 @@ const MainView = () => {
     "",
   );
 
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const getSelectedNote = () =>
     notes.find((n) => n.id === selectedNoteId) || null;
 
@@ -96,6 +104,12 @@ const MainView = () => {
   useEffect(() => {
     setTextAreaValue(getTextAreaValue());
   }, [selectedNoteId, notes, scratchpadValue]);
+
+  useEffect(() => {
+    if (selectedNoteId && textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+  }, [selectedNoteId]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -163,6 +177,7 @@ const MainView = () => {
         : {}),
     };
     setNotes([newNote, ...notes]);
+    setSelectedNoteId(newNote.id);
   };
 
   const handleFavNote = (id: string) => {
@@ -413,6 +428,7 @@ const MainView = () => {
               currentView === selectedView.FOLDERS))) && (
           <Grid className={styles.mainView__rightPanel}>
             <textarea
+              ref={textAreaRef}
               name="Dev Notes Text Area"
               value={textAreaValue}
               onChange={handleTextAreaChange}
