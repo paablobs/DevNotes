@@ -47,7 +47,6 @@ const CustomCard = ({
 
   const getFirstLine = (html: string) => {
     const plain = stripHtml(html).trim();
-    console.log(plain);
     if (!plain) return "New note";
     const lines = plain
       .split(/\r?\n/)
