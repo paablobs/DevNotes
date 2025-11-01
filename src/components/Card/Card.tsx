@@ -40,6 +40,22 @@ const CustomCard = ({
   onSelect,
   selected,
 }: CustomCardProps) => {
+  const stripHtml = (html: string) => {
+    if (!html) return "";
+    return html.replace(/<[^>]*>/g, "\n");
+  };
+
+  const getFirstLine = (html: string) => {
+    const plain = stripHtml(html).trim();
+    console.log(plain);
+    if (!plain) return "New note";
+    const lines = plain
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    return lines.length ? lines[0] : "New note";
+  };
+
   return (
     <Box className={styles.box}>
       <Card
@@ -50,7 +66,7 @@ const CustomCard = ({
       >
         <CardContent>
           <Typography variant="h5" component="div" className={styles.box__text}>
-            {(text.match(/^(.*\S.*)$/m) || ["New note"])[0]}
+            {getFirstLine(text)}
           </Typography>
           <Typography variant="body2" className={styles.box__text}>
             {category}

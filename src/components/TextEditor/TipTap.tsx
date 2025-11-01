@@ -1,0 +1,50 @@
+import { useMemo, useEffect } from "react";
+import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
+import styles from "./TipTap.module.scss";
+
+interface TiptapProps {
+  content: string;
+  onChange?: (content: string) => void;
+  editable?: boolean;
+}
+
+const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
+  const editor = useEditor({
+    extensions: [StarterKit, Highlight, Typography],
+    content: content ?? "",
+    editable,
+    autofocus: true,
+    onUpdate: ({ editor }) => {
+      onChange?.(editor.getHTML());
+    },
+
+    editorProps: {
+      attributes: {
+        class: styles.editor,
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (!editor) return;
+    const current = editor.getHTML();
+    if (content !== undefined && content !== current) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
+
+  const providerValue = useMemo(() => ({ editor }), [editor]);
+
+  console.log(editor.getText());
+
+  return (
+    <EditorContext.Provider value={providerValue}>
+      <EditorContent editor={editor} />
+    </EditorContext.Provider>
+  );
+};
+
+export default Tiptap;

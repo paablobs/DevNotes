@@ -42,6 +42,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
+import Tiptap from "../TextEditor/TipTap";
 
 // styles
 import styles from "./MainView.module.scss";
@@ -79,7 +80,7 @@ const MainView = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
     "scratchpad",
-    "Welcome to DevNotes!\n\nThis is your scratchpad. You can jot down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
+    "Welcome to DevNotes!\n\nThis is your scratchpad. You can write down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
   );
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -205,8 +206,7 @@ const MainView = () => {
     }
   };
 
-  const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
+  const handleEditorChange = (value: string) => {
     setTextAreaValue(value);
     if (currentView === selectedView.SCRATCHPAD) {
       setScratchpadValue(value);
@@ -434,7 +434,7 @@ const MainView = () => {
               currentView === selectedView.FOLDERS ||
               currentView === selectedView.TRASH))) && (
           <Grid className={styles.mainView__rightPanel}>
-            <textarea
+            {/* <textarea
               ref={textAreaRef}
               name="Dev Notes Text Area"
               value={textAreaValue}
@@ -442,6 +442,11 @@ const MainView = () => {
               className={styles.mainView__editor}
               disabled={currentView === selectedView.TRASH}
               autoFocus
+            /> */}
+            <Tiptap
+              content={textAreaValue}
+              onChange={handleEditorChange}
+              editable={currentView !== selectedView.TRASH}
             />
           </Grid>
         )}
