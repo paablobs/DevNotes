@@ -434,15 +434,6 @@ const MainView = () => {
               currentView === selectedView.FOLDERS ||
               currentView === selectedView.TRASH))) && (
           <Grid className={styles.mainView__rightPanel}>
-            {/* <textarea
-              ref={textAreaRef}
-              name="Dev Notes Text Area"
-              value={textAreaValue}
-              onChange={handleTextAreaChange}
-              className={styles.mainView__editor}
-              disabled={currentView === selectedView.TRASH}
-              autoFocus
-            /> */}
             <Tiptap
               content={textAreaValue}
               onChange={handleEditorChange}
