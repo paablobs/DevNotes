@@ -1,54 +1,51 @@
-# React + TypeScript + Vite
+# DevNotes — Offline-first Rich Text Notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DevNotes is a compact, offline-first note-taking web app built with React, TypeScript and Vite. It combines a lightweight local-first data layer with a polished UI and a rich-text editor (TipTap) so you can create, organize and edit notes with no backend required.
 
-Currently, two official plugins are available:
+Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Rich-text editor (TipTap) with typography and highlight extensions
+- Scratchpad for quick ephemeral notes
+- Create, rename and delete folders
+- Mark notes as favorites
+- Trash with restore and Empty Trash
+- Per-note HTML storage (TipTap) with safe previews in the note list
+- Local persistence via a robust `useLocalStorage` hook (syncs across tabs)
 
-## Expanding the ESLint configuration
+Quick start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Install dependencies:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Start the dev server with Vite:
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
+```bash
+npm run dev
 ```
+
+3. Build for production:
+
+```bash
+npm run build
+```
+
+4. Preview the production build:
+
+```bash
+npm run preview
+```
+
+Helpful scripts
+
+- `npm run lint` — run ESLint
+- `npm run storybook` — start Storybook for components
+
+Core ideas / architecture
+
+- React + TypeScript + Vite for a fast developer experience
+- MUI (Material UI) for consistent UI components
+- TipTap for WYSIWYG editing; notes are stored as HTML strings
+- `useLocalStorage` provides a React-friendly interface to localStorage with cross-tab update dispatching
