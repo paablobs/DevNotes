@@ -16,11 +16,11 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
     extensions: [StarterKit, Highlight, Typography],
     content: content ?? "",
     editable,
-    autofocus: true,
+    autofocus: "end",
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },
-
+    injectCSS: false,
     editorProps: {
       attributes: {
         class: styles.editor,
@@ -37,8 +37,6 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
   }, [editor, content]);
 
   const providerValue = useMemo(() => ({ editor }), [editor]);
-
-  console.log(editor.getText());
 
   return (
     <EditorContext.Provider value={providerValue}>
