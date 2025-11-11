@@ -1,10 +1,4 @@
-import {
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-  useEffect,
-  useRef,
-} from "react";
+import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 
 // Components & Icons
 import {
@@ -83,8 +77,6 @@ const MainView = () => {
     "Welcome to DevNotes!\n\nThis is your scratchpad. You can write down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
   );
 
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-
   const getSelectedNote = () =>
     notes.find((n) => n.id === selectedNoteId) || null;
 
@@ -101,17 +93,7 @@ const MainView = () => {
       setSelectedNoteId(null);
     }
     setTextAreaValue(getTextAreaValue());
-  }, [currentView]);
-
-  useEffect(() => {
-    setTextAreaValue(getTextAreaValue());
-  }, [selectedNoteId, notes, scratchpadValue]);
-
-  useEffect(() => {
-    if (selectedNoteId && textAreaRef.current) {
-      textAreaRef.current.focus();
-    }
-  }, [selectedNoteId]);
+  }, [currentView, selectedNoteId, notes, scratchpadValue]);
 
   const handleClickOpen = () => {
     setOpen(true);
