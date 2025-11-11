@@ -16,7 +16,7 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
     extensions: [StarterKit, Highlight, Typography],
     content: content ?? "",
     editable,
-    autofocus: "end",
+    autofocus: true,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },

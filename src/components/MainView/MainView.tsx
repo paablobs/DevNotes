@@ -93,7 +93,11 @@ const MainView = () => {
       setSelectedNoteId(null);
     }
     setTextAreaValue(getTextAreaValue());
-  }, [currentView, selectedNoteId, notes, scratchpadValue]);
+  }, [currentView]);
+
+  useEffect(() => {
+    setTextAreaValue(getTextAreaValue());
+  }, [selectedNoteId, notes, scratchpadValue]);
 
   const handleClickOpen = () => {
     setOpen(true);
