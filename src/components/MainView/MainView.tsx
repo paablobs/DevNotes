@@ -182,6 +182,7 @@ const MainView = () => {
       const updatedNote = { ...note, isTrash: true };
       setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
     }
+    setSelectedNoteId(null);
   };
 
   const handleRestoreNote = (id: string) => {
@@ -202,6 +203,8 @@ const MainView = () => {
       );
     }
   };
+
+  console.log(selectedNoteId);
 
   return (
     <div className={styles.mainView}>
@@ -413,12 +416,7 @@ const MainView = () => {
             )}
           </Grid>
         )}
-        {(currentView === selectedView.SCRATCHPAD ||
-          (selectedNoteId &&
-            (currentView === selectedView.NOTES ||
-              currentView === selectedView.FAVORITES ||
-              currentView === selectedView.FOLDERS ||
-              currentView === selectedView.TRASH))) && (
+        {selectedNoteId && (
           <Grid className={styles.mainView__rightPanel}>
             <Tiptap
               content={textAreaValue}

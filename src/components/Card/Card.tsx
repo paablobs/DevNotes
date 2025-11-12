@@ -74,20 +74,47 @@ const CustomCard = ({
         <CardActions>
           {!isTrash && (
             <>
-              <IconButton onClick={onFav ? () => onFav(id) : undefined}>
+              <IconButton
+                onClick={
+                  onFav
+                    ? (e) => {
+                        e.stopPropagation();
+                        onFav(id);
+                      }
+                    : undefined
+                }
+              >
                 {isFav ? (
                   <StarIcon sx={{ color: yellow[700] }} />
                 ) : (
                   <StarredIcon />
                 )}
               </IconButton>
-              <IconButton onClick={onTrash ? () => onTrash(id) : undefined}>
+              <IconButton
+                onClick={
+                  onTrash
+                    ? (e) => {
+                        e.stopPropagation();
+                        onTrash(id);
+                      }
+                    : undefined
+                }
+              >
                 <DeleteOutlineIcon />
               </IconButton>
             </>
           )}
           {isTrash && (
-            <IconButton onClick={onRestore ? () => onRestore(id) : undefined}>
+            <IconButton
+              onClick={
+                onRestore
+                  ? (e) => {
+                      e.stopPropagation();
+                      onRestore(id);
+                    }
+                  : undefined
+              }
+            >
               <RestoreIcon />
             </IconButton>
           )}
