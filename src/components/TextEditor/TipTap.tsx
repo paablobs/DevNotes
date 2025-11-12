@@ -1,8 +1,12 @@
 import { useMemo, useEffect } from "react";
 import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Text from "@tiptap/extension-text";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
+
+import { ColorHighlighter } from "./ColorHighlighter/ColorHighlighter";
+import { SmilieReplacer } from "./SmilieReplacer/SmilieReplacer";
 import styles from "./TipTap.module.scss";
 
 interface TiptapProps {
@@ -13,14 +17,20 @@ interface TiptapProps {
 
 const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
   const editor = useEditor({
-    extensions: [StarterKit, Highlight, Typography],
+    extensions: [
+      StarterKit,
+      Text,
+      Highlight,
+      Typography,
+      ColorHighlighter,
+      SmilieReplacer,
+    ],
     content: content ?? "",
     editable,
     autofocus: true,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },
-    injectCSS: false,
     editorProps: {
       attributes: {
         class: styles.editor,

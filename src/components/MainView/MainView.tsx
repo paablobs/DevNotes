@@ -204,8 +204,6 @@ const MainView = () => {
     }
   };
 
-  console.log(selectedNoteId);
-
   return (
     <div className={styles.mainView}>
       <Grid container spacing={0} className={styles.mainView__gridContainer}>
