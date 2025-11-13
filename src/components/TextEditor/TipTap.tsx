@@ -1,7 +1,6 @@
 import { useMemo, useEffect } from "react";
 import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Text from "@tiptap/extension-text";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 
@@ -19,7 +18,6 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Text,
       Highlight,
       Typography,
       ColorHighlighter,
