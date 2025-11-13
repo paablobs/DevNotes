@@ -144,7 +144,18 @@ const MainView = () => {
 
   const handleDeleteFolder = (id: string) => {
     setFolders(folders.filter((folder) => folder.id !== id));
-    setNotes(notes.filter((note) => note.folderId !== id));
+    setNotes(
+      notes.map((note) =>
+        note.folderId === id
+          ? {
+              ...note,
+              isTrash: true,
+              folderId: undefined,
+              category: "All notes",
+            }
+          : note,
+      ),
+    );
     setSelectedFolderId(null);
   };
 
