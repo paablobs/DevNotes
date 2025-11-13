@@ -21,6 +21,7 @@
     "@tiptap/extension-typography": "^3.10.1",
     "@tiptap/react": "^3.10.1",
     "@tiptap/starter-kit": "^3.10.1",
+    "material-ui-popup-state": "^5.3.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "uuid": "^11.1.0"

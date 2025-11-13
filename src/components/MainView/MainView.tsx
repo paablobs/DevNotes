@@ -176,6 +176,17 @@ const MainView = () => {
     }
   };
 
+  const handleMoveNoteToFolder = (noteId: string, folderId: string) => {
+    const folder = folders.find((f) => f.id === folderId);
+    setNotes(
+      notes.map((n) =>
+        n.id === noteId
+          ? { ...n, folderId, category: folder ? folder.name : n.category }
+          : n,
+      ),
+    );
+  };
+
   const handleTrashNote = (id: string) => {
     const note = notes.find((note) => note.id === id);
     if (note) {
@@ -333,6 +344,9 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onMoveToFolder={handleMoveNoteToFolder}
+                        folders={folders}
+                        folderId={card.folderId}
                         onSelect={setSelectedNoteId}
                         selected={selectedNoteId === card.id}
                       />
@@ -352,6 +366,9 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onMoveToFolder={handleMoveNoteToFolder}
+                        folders={folders}
+                        folderId={card.folderId}
                         onSelect={setSelectedNoteId}
                         selected={selectedNoteId === card.id}
                       />
@@ -374,6 +391,9 @@ const MainView = () => {
                         isFav={card.isFav}
                         onFav={handleFavNote}
                         onTrash={handleTrashNote}
+                        onMoveToFolder={handleMoveNoteToFolder}
+                        folders={folders}
+                        folderId={card.folderId}
                         onSelect={setSelectedNoteId}
                         selected={selectedNoteId === card.id}
                       />
