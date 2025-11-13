@@ -27,7 +27,7 @@ interface CustomCardProps {
   onFav?: (id: string) => void;
   onTrash?: (id: string) => void;
   onRestore?: (id: string) => void;
-  folders?: { id: string; name: string }[];
+  folders?: { id: string; name: string; color?: string }[];
   onMoveToFolder?: (noteId: string, folderId: string) => void;
   folderId?: string | null;
   onSelect?: (id: string) => void;

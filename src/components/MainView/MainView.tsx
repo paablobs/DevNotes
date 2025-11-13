@@ -28,7 +28,25 @@ import {
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
-import { yellow, green, red } from "@mui/material/colors";
+import {
+  yellow,
+  green,
+  red,
+  amber,
+  blue,
+  blueGrey,
+  cyan,
+  deepOrange,
+  deepPurple,
+  lightBlue,
+  lightGreen,
+  indigo,
+  lime,
+  orange,
+  pink,
+  purple,
+  teal,
+} from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
@@ -53,7 +71,41 @@ interface Note {
 interface Folder {
   id: string;
   name: string;
+  color?: string;
 }
+
+type ColorShades = { [shade: string]: string };
+
+const colorPalette: ColorShades[] = [
+  yellow,
+  green,
+  red,
+  amber,
+  blue,
+  blueGrey,
+  cyan,
+  deepOrange,
+  deepPurple,
+  lightBlue,
+  lightGreen,
+  indigo,
+  lime,
+  orange,
+  pink,
+  purple,
+  teal,
+];
+
+const randomColor = (): string => {
+  const colObj = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+  const preferredShades = [500, 600, 400, 700, 300, 200, 50];
+  for (const s of preferredShades) {
+    const key = String(s);
+    if (colObj[key]) return colObj[key];
+  }
+  const vals = Object.values(colObj);
+  return typeof vals[0] === "string" ? vals[0] : "#FFC107";
+};
 
 const MainView = () => {
   const [folders, setFolders] = useLocalStorage<Folder[]>(
@@ -93,7 +145,7 @@ const MainView = () => {
       setSelectedNoteId(null);
     }
     setTextAreaValue(getTextAreaValue());
-  }, [currentView]);
+  }, [currentView, getTextAreaValue]);
 
   useEffect(() => {
     setTextAreaValue(getTextAreaValue());
@@ -118,6 +170,7 @@ const MainView = () => {
       const newFolder: Folder = {
         id: uuidv4(),
         name: folderName.trim(),
+        color: randomColor(),
       };
       setFolders([newFolder, ...folders]);
       setFolderName("");
@@ -315,7 +368,7 @@ const MainView = () => {
                     }}
                   >
                     <ListItemIcon>
-                      <FolderIcon sx={{ color: yellow[500] }} />
+                      <FolderIcon sx={{ color: folder.color ?? yellow[500] }} />
                     </ListItemIcon>
                     <ListItemText primary={folder.name} />
                   </ListItemButton>
