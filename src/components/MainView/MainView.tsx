@@ -145,7 +145,7 @@ const MainView = () => {
       setSelectedNoteId(null);
     }
     setTextAreaValue(getTextAreaValue());
-  }, [currentView, getTextAreaValue]);
+  }, [currentView]);
 
   useEffect(() => {
     setTextAreaValue(getTextAreaValue());
