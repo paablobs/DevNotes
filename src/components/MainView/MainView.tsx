@@ -1,5 +1,3 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
-
 // Components & Icons
 import {
   Grid,
@@ -28,256 +26,54 @@ import {
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
 } from "@mui/icons-material";
-import {
-  yellow,
-  green,
-  red,
-  amber,
-  blue,
-  blueGrey,
-  cyan,
-  deepOrange,
-  deepPurple,
-  lightBlue,
-  lightGreen,
-  indigo,
-  lime,
-  orange,
-  pink,
-  purple,
-  teal,
-} from "@mui/material/colors";
-import { v4 as uuidv4 } from "uuid";
+import { yellow, green, red } from "@mui/material/colors";
+import { useState } from "react";
 
 // Custom Hooks & Styles & Components
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { selectedView, type SelectedView } from "../../utils/selectedView";
-import { storageKeys } from "../../utils/storageKeys";
+import { useMainViewCoordination } from "../../helpers/useMainViewCoordination";
+import { selectedView } from "../../utils/selectedView";
 import CustomCard from "../Card/Card";
 import Tiptap from "../TextEditor/TipTap";
 
 // styles
 import styles from "./MainView.module.scss";
 
-interface Note {
-  id: string;
-  text: string;
-  category: string;
-  isFav: boolean;
-  isTrash: boolean;
-  folderId?: string;
-}
-
-interface Folder {
-  id: string;
-  name: string;
-  color?: string;
-}
-
-type ColorShades = { [shade: string]: string };
-
-const colorPalette: ColorShades[] = [
-  yellow,
-  green,
-  red,
-  amber,
-  blue,
-  blueGrey,
-  cyan,
-  deepOrange,
-  deepPurple,
-  lightBlue,
-  lightGreen,
-  indigo,
-  lime,
-  orange,
-  pink,
-  purple,
-  teal,
-];
-
-const randomColor = (): string => {
-  const colObj = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-  const preferredShades = [500, 600, 400, 700, 300, 200, 50];
-  for (const s of preferredShades) {
-    const key = String(s);
-    if (colObj[key]) return colObj[key];
-  }
-  const vals = Object.values(colObj);
-  return typeof vals[0] === "string" ? vals[0] : "#FFC107";
-};
-
 const MainView = () => {
-  const [folders, setFolders] = useLocalStorage<Folder[]>(
-    storageKeys.FOLDERS,
-    [],
-  );
-  const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
+  const {
+    // Folder management
+    folders,
+    open,
+    folderName,
+    openDeleteDialog,
+    folderToDelete,
+    handleClickOpen,
+    handleClose,
+    handleFolderNameChange,
+    handleAddFolder,
+    handleOpenDeleteDialog,
+    handleCloseDeleteDialog,
+    handleConfirmDeleteFolder,
+    // Note management
+    notes,
+    selectedNoteId,
+    handleNewNote,
+    handleFavNote,
+    handleMoveNoteToFolder,
+    handleTrashNote,
+    handleRestoreNote,
+    // Editor state
+    textAreaValue,
+    handleEditorChange,
+    // View navigation
+    currentView,
+    selectedFolderId,
+    setCurrentView,
+    setSelectedFolderId,
+    setSelectedNoteId,
+    setNotes,
+  } = useMainViewCoordination();
 
-  const [open, setOpen] = useState(false);
-  const [folderName, setFolderName] = useState("");
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
   const [openEmptyTrashDialog, setOpenEmptyTrashDialog] = useState(false);
-  const [currentView, setCurrentView] = useState<SelectedView>(
-    selectedView.NOTES,
-  );
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
-    "scratchpad",
-    "Welcome to DevNotes!\n\nThis is your scratchpad. You can write down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
-  );
-
-  const getSelectedNote = () =>
-    notes.find((n) => n.id === selectedNoteId) || null;
-
-  const getTextAreaValue = () => {
-    if (currentView === selectedView.SCRATCHPAD) return scratchpadValue;
-    const note = getSelectedNote();
-    return note ? note.text : "";
-  };
-
-  const [textAreaValue, setTextAreaValue] = useState(getTextAreaValue());
-
-  useEffect(() => {
-    if (currentView !== selectedView.SCRATCHPAD) {
-      setSelectedNoteId(null);
-    }
-    setTextAreaValue(getTextAreaValue());
-  }, [currentView]);
-
-  useEffect(() => {
-    setTextAreaValue(getTextAreaValue());
-  }, [selectedNoteId, notes, scratchpadValue]);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setFolderName("");
-  };
-
-  const handleFolderNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFolderName(event.target.value);
-  };
-
-  const handleAddFolder = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (folderName.trim()) {
-      const newFolder: Folder = {
-        id: uuidv4(),
-        name: folderName.trim(),
-        color: randomColor(),
-      };
-      setFolders([newFolder, ...folders]);
-      setFolderName("");
-    }
-    handleClose();
-  };
-
-  const handleOpenDeleteDialog = (folder: Folder) => {
-    setFolderToDelete(folder);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-    setFolderToDelete(null);
-  };
-
-  const handleConfirmDeleteFolder = () => {
-    if (folderToDelete) {
-      handleDeleteFolder(folderToDelete.id);
-    }
-    handleCloseDeleteDialog();
-  };
-
-  const handleDeleteFolder = (id: string) => {
-    setFolders(folders.filter((folder) => folder.id !== id));
-    setNotes(
-      notes.map((note) =>
-        note.folderId === id
-          ? {
-              ...note,
-              isTrash: true,
-              folderId: undefined,
-              category: "All notes",
-            }
-          : note,
-      ),
-    );
-    setSelectedFolderId(null);
-  };
-
-  const handleNewNote = () => {
-    let category = "All notes";
-    if (currentView === selectedView.FOLDERS && selectedFolderId) {
-      const folder = folders.find((f) => f.id === selectedFolderId);
-      if (folder) category = folder.name;
-    }
-    const newNote: Note = {
-      id: uuidv4(),
-      text: "",
-      category,
-      isFav: currentView === selectedView.FAVORITES,
-      isTrash: false,
-      ...(currentView === selectedView.FOLDERS && selectedFolderId
-        ? { folderId: selectedFolderId }
-        : {}),
-    };
-    setNotes([newNote, ...notes]);
-    setSelectedNoteId(newNote.id);
-  };
-
-  const handleFavNote = (id: string) => {
-    const note = notes.find((note) => note.id === id);
-    if (note) {
-      const updatedNote = { ...note, isFav: !note.isFav };
-      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
-    }
-  };
-
-  const handleMoveNoteToFolder = (noteId: string, folderId: string) => {
-    const folder = folders.find((f) => f.id === folderId);
-    setNotes(
-      notes.map((n) =>
-        n.id === noteId
-          ? { ...n, folderId, category: folder ? folder.name : n.category }
-          : n,
-      ),
-    );
-  };
-
-  const handleTrashNote = (id: string) => {
-    const note = notes.find((note) => note.id === id);
-    if (note) {
-      const updatedNote = { ...note, isTrash: true };
-      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
-    }
-    setSelectedNoteId(null);
-  };
-
-  const handleRestoreNote = (id: string) => {
-    const note = notes.find((n) => n.id === id && n.isTrash);
-    if (note) {
-      const restoredNote = { ...note, isTrash: false };
-      setNotes(notes.map((n) => (n.id === id ? restoredNote : n)));
-    }
-  };
-
-  const handleEditorChange = (value: string) => {
-    setTextAreaValue(value);
-    if (currentView === selectedView.SCRATCHPAD) {
-      setScratchpadValue(value);
-    } else if (selectedNoteId) {
-      setNotes(
-        notes.map((n) => (n.id === selectedNoteId ? { ...n, text: value } : n)),
-      );
-    }
-  };
 
   return (
     <div className={styles.mainView}>
@@ -566,7 +362,7 @@ const MainView = () => {
           <Button onClick={() => setOpenEmptyTrashDialog(false)}>Cancel</Button>
           <Button
             onClick={() => {
-              setNotes(notes.filter((n) => !n.isTrash));
+              setNotes((prevNotes) => prevNotes.filter((n) => !n.isTrash));
               setOpenEmptyTrashDialog(false);
             }}
             color="error"
