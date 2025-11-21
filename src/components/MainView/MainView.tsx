@@ -51,6 +51,7 @@ import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useMainViewModals } from "../../hooks/useMainViewModals";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
@@ -114,11 +115,6 @@ const MainView = () => {
   );
   const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
 
-  const [open, setOpen] = useState(false);
-  const [folderName, setFolderName] = useState("");
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
-  const [openEmptyTrashDialog, setOpenEmptyTrashDialog] = useState(false);
   const [currentView, setCurrentView] = useState<SelectedView>(
     selectedView.NOTES,
   );
@@ -151,48 +147,54 @@ const MainView = () => {
     setTextAreaValue(getTextAreaValue());
   }, [selectedNoteId, notes, scratchpadValue]);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const {
+    addFolderOpen,
+    openAddFolder,
+    closeAddFolder,
+    folderName,
+    setFolderName,
+    submitAddFolder,
+    deleteDialogOpen,
+    folderToDelete,
+    openDeleteDialogWith,
+    closeDeleteDialog,
+    confirmDeleteFolder,
+    emptyTrashOpen,
+    openEmptyTrash,
+    closeEmptyTrash,
+    confirmEmptyTrash,
+  } = useMainViewModals();
 
-  const handleClose = () => {
-    setOpen(false);
-    setFolderName("");
-  };
-
-  const handleFolderNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleClickOpen = openAddFolder;
+  const handleClose = closeAddFolder;
+  const handleFolderNameChange = (event: ChangeEvent<HTMLInputElement>) =>
     setFolderName(event.target.value);
-  };
 
   const handleAddFolder = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (folderName.trim()) {
+    const name = submitAddFolder(event);
+    if (name) {
       const newFolder: Folder = {
         id: uuidv4(),
-        name: folderName.trim(),
+        name,
         color: randomColor(),
       };
       setFolders([newFolder, ...folders]);
-      setFolderName("");
     }
-    handleClose();
   };
 
-  const handleOpenDeleteDialog = (folder: Folder) => {
-    setFolderToDelete(folder);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-    setFolderToDelete(null);
-  };
-
+  const handleOpenDeleteDialog = (folder: Folder) =>
+    openDeleteDialogWith(folder);
+  const handleCloseDeleteDialog = closeDeleteDialog;
   const handleConfirmDeleteFolder = () => {
-    if (folderToDelete) {
-      handleDeleteFolder(folderToDelete.id);
-    }
-    handleCloseDeleteDialog();
+    const id = confirmDeleteFolder();
+    if (id) handleDeleteFolder(id);
+  };
+
+  const handleOpenEmptyTrashDialog = openEmptyTrash;
+  const handleCloseEmptyTrashDialog = closeEmptyTrash;
+  const handleConfirmEmptyTrash = () => {
+    const ok = confirmEmptyTrash();
+    if (ok) setNotes(notes.filter((n) => !n.isTrash));
   };
 
   const handleDeleteFolder = (id: string) => {
@@ -467,7 +469,7 @@ const MainView = () => {
               <>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => setOpenEmptyTrashDialog(true)}
+                    onClick={handleOpenEmptyTrashDialog}
                     divider
                     sx={{ bgcolor: red[900] }}
                   >
@@ -508,7 +510,7 @@ const MainView = () => {
           </Grid>
         )}
       </Grid>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={addFolderOpen} onClose={handleClose}>
         <form onSubmit={handleAddFolder}>
           <DialogTitle>Add Folder</DialogTitle>
           <DialogContent>
@@ -535,7 +537,7 @@ const MainView = () => {
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
         <DialogTitle>Delete Folder</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -551,10 +553,7 @@ const MainView = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        open={openEmptyTrashDialog}
-        onClose={() => setOpenEmptyTrashDialog(false)}
-      >
+      <Dialog open={emptyTrashOpen} onClose={handleCloseEmptyTrashDialog}>
         <DialogTitle>Empty Trash</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -563,14 +562,8 @@ const MainView = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEmptyTrashDialog(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              setNotes(notes.filter((n) => !n.isTrash));
-              setOpenEmptyTrashDialog(false);
-            }}
-            color="error"
-          >
+          <Button onClick={handleCloseEmptyTrashDialog}>Cancel</Button>
+          <Button onClick={handleConfirmEmptyTrash} color="error">
             Empty Trash
           </Button>
         </DialogActions>
