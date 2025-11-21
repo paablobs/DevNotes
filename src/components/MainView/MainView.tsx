@@ -1,35 +1,8 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 
 // Components & Icons
+import { Grid } from "@mui/material";
 import {
-  Grid,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  List,
-  Divider,
-} from "@mui/material";
-import {
-  DashboardCustomize as DashboardCustomizeIcon,
-  Delete as DeleteIcon,
-  Star as StarIcon,
-  Add as AddIcon,
-  Folder as FolderIcon,
-  Clear as ClearIcon,
-  Notes as NotesIcon,
-  CreateNewFolder as CreateNewFolderIcon,
-} from "@mui/icons-material";
-import {
-  yellow,
   green,
   red,
   amber,
@@ -46,6 +19,7 @@ import {
   pink,
   purple,
   teal,
+  yellow,
 } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
@@ -53,13 +27,17 @@ import { v4 as uuidv4 } from "uuid";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
-import CustomCard from "../Card/Card";
 import Tiptap from "../TextEditor/TipTap";
+import LeftPanel from "./LeftPanel/LeftPanel";
+import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
+import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
+import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
 
 // styles
 import styles from "./MainView.module.scss";
+import MiddlePanel from "./MiddlePanel/MiddlePanel";
 
-interface Note {
+export interface Note {
   id: string;
   text: string;
   category: string;
@@ -114,7 +92,7 @@ const MainView = () => {
   );
   const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
 
-  const [open, setOpen] = useState(false);
+  const [openCreateFolderDialog, setOpenCreateFolderDialog] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
@@ -152,11 +130,11 @@ const MainView = () => {
   }, [selectedNoteId, notes, scratchpadValue]);
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenCreateFolderDialog(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenCreateFolderDialog(false);
     setFolderName("");
   };
 
@@ -240,12 +218,18 @@ const MainView = () => {
     }
   };
 
-  const handleMoveNoteToFolder = (noteId: string, folderId: string) => {
-    const folder = folders.find((f) => f.id === folderId);
+  const handleMoveNoteToFolder = (noteId: string, folderId: string | null) => {
+    const folder = folderId
+      ? folders.find((f) => f.id === folderId)
+      : undefined;
     setNotes(
       notes.map((n) =>
         n.id === noteId
-          ? { ...n, folderId, category: folder ? folder.name : n.category }
+          ? {
+              ...n,
+              folderId: folderId ?? undefined,
+              category: folder ? folder.name : n.category,
+            }
           : n,
       ),
     );
@@ -284,222 +268,37 @@ const MainView = () => {
       <Grid container spacing={0} className={styles.mainView__gridContainer}>
         <Grid width={300}>
           <div className={styles.mainView__leftPanel}>
-            <List>
-              <ListItem>
-                <ListItemText className={styles.mainView__leftPanel__logo}>
-                  DevNotes
-                </ListItemText>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.SCRATCHPAD}
-                  onClick={() => setCurrentView(selectedView.SCRATCHPAD)}
-                >
-                  <ListItemIcon>
-                    <DashboardCustomizeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Scratchpad" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.NOTES}
-                  onClick={() => setCurrentView(selectedView.NOTES)}
-                >
-                  <ListItemIcon>
-                    <NotesIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="All notes" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.FAVORITES}
-                  onClick={() => setCurrentView(selectedView.FAVORITES)}
-                >
-                  <ListItemIcon>
-                    <StarIcon sx={{ color: yellow[700] }} />
-                  </ListItemIcon>
-                  <ListItemText primary="Favorites" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.TRASH}
-                  onClick={() => setCurrentView(selectedView.TRASH)}
-                >
-                  <ListItemIcon>
-                    <DeleteIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Trash" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton onClick={handleClickOpen}>
-                  <ListItemIcon>
-                    <CreateNewFolderIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Add folder" />
-                </ListItemButton>
-              </ListItem>
-              <Divider sx={{ margin: 2 }} />
-              {folders.map((folder) => (
-                <ListItem
-                  key={folder.id}
-                  disablePadding
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      onClick={() => handleOpenDeleteDialog(folder)}
-                      aria-label="delete-folder"
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemButton
-                    selected={
-                      currentView === selectedView.FOLDERS &&
-                      selectedFolderId === folder.id
-                    }
-                    onClick={() => {
-                      setCurrentView(selectedView.FOLDERS);
-                      setSelectedFolderId(folder.id);
-                    }}
-                  >
-                    <ListItemIcon>
-                      <FolderIcon sx={{ color: folder.color ?? yellow[500] }} />
-                    </ListItemIcon>
-                    <ListItemText primary={folder.name} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
+            <LeftPanel
+              currentView={currentView}
+              selectedFolderId={selectedFolderId}
+              folders={folders}
+              onViewChange={setCurrentView}
+              onFolderSelect={setSelectedFolderId}
+              onAddFolder={handleClickOpen}
+              onDeleteFolder={handleOpenDeleteDialog}
+            />
           </div>
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid maxWidth={400} className={styles.mainView__middlePanel}>
-            {currentView !== selectedView.TRASH && (
-              <ListItem disablePadding>
-                <ListItemButton
-                  onClick={handleNewNote}
-                  disabled={currentView === selectedView.SCRATCHPAD}
-                  divider
-                  sx={{ bgcolor: green[900] }}
-                >
-                  <ListItemIcon>
-                    <AddIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="New note" />
-                </ListItemButton>
-              </ListItem>
-            )}
-            {currentView === selectedView.NOTES &&
-              notes
-                .filter((card) => !card.isTrash)
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.FAVORITES &&
-              notes
-                .filter((card) => card.isFav && !card.isTrash)
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.FOLDERS &&
-              selectedFolderId &&
-              notes
-                .filter(
-                  (note) => note.folderId === selectedFolderId && !note.isTrash,
-                )
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.TRASH && (
-              <>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => setOpenEmptyTrashDialog(true)}
-                    divider
-                    sx={{ bgcolor: red[900] }}
-                  >
-                    <ListItemIcon>
-                      <DeleteIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Empty Trash" />
-                  </ListItemButton>
-                </ListItem>
-                {notes
-                  .filter((card) => card.isTrash)
-                  .map(
-                    (card) =>
-                      card && (
-                        <CustomCard
-                          key={card.id}
-                          id={card.id}
-                          text={card.text}
-                          category={card.category}
-                          isTrash={card.isTrash}
-                          onRestore={handleRestoreNote}
-                          onSelect={setSelectedNoteId}
-                          selected={selectedNoteId === card.id}
-                        />
-                      ),
-                  )}
-              </>
-            )}
+            <MiddlePanel
+              currentView={currentView}
+              notes={notes}
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              selectedNoteId={selectedNoteId}
+              onNewNote={handleNewNote}
+              onFavNote={handleFavNote}
+              onTrashNote={handleTrashNote}
+              onMoveNoteToFolder={handleMoveNoteToFolder}
+              onRestoreNote={handleRestoreNote}
+              onCardSelect={setSelectedNoteId}
+              onEmptyTrash={() => setOpenEmptyTrashDialog(true)}
+            />
           </Grid>
         )}
         {(selectedNoteId || currentView === selectedView.SCRATCHPAD) && (
-          <Grid className={styles.mainView__rightPanel}>
+          <Grid size="grow" className={styles.mainView__rightPanel}>
             <Tiptap
               content={textAreaValue}
               onChange={handleEditorChange}
@@ -508,73 +307,27 @@ const MainView = () => {
           </Grid>
         )}
       </Grid>
-      <Dialog open={open} onClose={handleClose}>
-        <form onSubmit={handleAddFolder}>
-          <DialogTitle>Add Folder</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Please enter the name for the new folder.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="folderName"
-              name="folderName"
-              label="Folder Name"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={folderName}
-              onChange={handleFolderNameChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Add</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Delete Folder</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {`Are you sure you want to delete the folder "${
-              folderToDelete?.name ?? ""
-            }"? This action cannot be undone.`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-          <Button onClick={handleConfirmDeleteFolder} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={openEmptyTrashDialog}
+      <CreateFolderDialog
+        isOpen={openCreateFolderDialog}
+        folderName={folderName}
+        onFolderNameChange={handleFolderNameChange}
+        onAddFolder={handleAddFolder}
+        onClose={handleClose}
+      />
+      <DeleteFolderDialog
+        isOpen={openDeleteDialog}
+        folderName={folderToDelete?.name}
+        onDeleteFolder={handleConfirmDeleteFolder}
+        onClose={handleCloseDeleteDialog}
+      />
+      <EmptyTrashDialog
+        isOpen={openEmptyTrashDialog}
+        onEmptyTrash={() => {
+          setNotes(notes.filter((n) => !n.isTrash));
+          setOpenEmptyTrashDialog(false);
+        }}
         onClose={() => setOpenEmptyTrashDialog(false)}
-      >
-        <DialogTitle>Empty Trash</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to permanently delete all notes in the trash?
-            This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEmptyTrashDialog(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              setNotes(notes.filter((n) => !n.isTrash));
-              setOpenEmptyTrashDialog(false);
-            }}
-            color="error"
-          >
-            Empty Trash
-          </Button>
-        </DialogActions>
-      </Dialog>
+      />
     </div>
   );
 };
