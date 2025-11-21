@@ -7,22 +7,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  IconButton,
-  List,
-  Divider,
 } from "@mui/material";
+import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 import {
-  DashboardCustomize as DashboardCustomizeIcon,
-  Delete as DeleteIcon,
-  Star as StarIcon,
-  Add as AddIcon,
-  Folder as FolderIcon,
-  Clear as ClearIcon,
-  Notes as NotesIcon,
-  CreateNewFolder as CreateNewFolderIcon,
-} from "@mui/icons-material";
-import {
-  yellow,
   green,
   red,
   amber,
@@ -39,6 +26,7 @@ import {
   pink,
   purple,
   teal,
+  yellow,
 } from "@mui/material/colors";
 import { v4 as uuidv4 } from "uuid";
 
@@ -48,6 +36,7 @@ import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
 import Tiptap from "../TextEditor/TipTap";
+import LeftPanel from "./LeftPanel/LeftPanel";
 import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
 import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
 import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
@@ -280,97 +269,15 @@ const MainView = () => {
       <Grid container spacing={0} className={styles.mainView__gridContainer}>
         <Grid width={300}>
           <div className={styles.mainView__leftPanel}>
-            <List>
-              <ListItem>
-                <ListItemText className={styles.mainView__leftPanel__logo}>
-                  DevNotes
-                </ListItemText>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.SCRATCHPAD}
-                  onClick={() => setCurrentView(selectedView.SCRATCHPAD)}
-                >
-                  <ListItemIcon>
-                    <DashboardCustomizeIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Scratchpad" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.NOTES}
-                  onClick={() => setCurrentView(selectedView.NOTES)}
-                >
-                  <ListItemIcon>
-                    <NotesIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="All notes" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.FAVORITES}
-                  onClick={() => setCurrentView(selectedView.FAVORITES)}
-                >
-                  <ListItemIcon>
-                    <StarIcon sx={{ color: yellow[700] }} />
-                  </ListItemIcon>
-                  <ListItemText primary="Favorites" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton
-                  selected={currentView === selectedView.TRASH}
-                  onClick={() => setCurrentView(selectedView.TRASH)}
-                >
-                  <ListItemIcon>
-                    <DeleteIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Trash" />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton onClick={handleClickOpen}>
-                  <ListItemIcon>
-                    <CreateNewFolderIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Add folder" />
-                </ListItemButton>
-              </ListItem>
-              <Divider sx={{ margin: 2 }} />
-              {folders.map((folder) => (
-                <ListItem
-                  key={folder.id}
-                  disablePadding
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      onClick={() => handleOpenDeleteDialog(folder)}
-                      aria-label="delete-folder"
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemButton
-                    selected={
-                      currentView === selectedView.FOLDERS &&
-                      selectedFolderId === folder.id
-                    }
-                    onClick={() => {
-                      setCurrentView(selectedView.FOLDERS);
-                      setSelectedFolderId(folder.id);
-                    }}
-                  >
-                    <ListItemIcon>
-                      <FolderIcon sx={{ color: folder.color ?? yellow[500] }} />
-                    </ListItemIcon>
-                    <ListItemText primary={folder.name} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
+            <LeftPanel
+              currentView={currentView}
+              selectedFolderId={selectedFolderId}
+              folders={folders}
+              onViewChange={setCurrentView}
+              onFolderSelect={setSelectedFolderId}
+              onAddFolder={handleClickOpen}
+              onDeleteFolder={handleOpenDeleteDialog}
+            />
           </div>
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
