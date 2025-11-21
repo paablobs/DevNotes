@@ -1,14 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
 
 // Components & Icons
-import {
-  Grid,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
+import { Grid } from "@mui/material";
 import {
   green,
   red,
@@ -34,7 +27,6 @@ import { v4 as uuidv4 } from "uuid";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
-import CustomCard from "../Card/Card";
 import Tiptap from "../TextEditor/TipTap";
 import LeftPanel from "./LeftPanel/LeftPanel";
 import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
@@ -43,8 +35,9 @@ import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
 
 // styles
 import styles from "./MainView.module.scss";
+import MiddlePanel from "./MiddlePanel/MiddlePanel";
 
-interface Note {
+export interface Note {
   id: string;
   text: string;
   category: string;
@@ -225,12 +218,18 @@ const MainView = () => {
     }
   };
 
-  const handleMoveNoteToFolder = (noteId: string, folderId: string) => {
-    const folder = folders.find((f) => f.id === folderId);
+  const handleMoveNoteToFolder = (noteId: string, folderId: string | null) => {
+    const folder = folderId
+      ? folders.find((f) => f.id === folderId)
+      : undefined;
     setNotes(
       notes.map((n) =>
         n.id === noteId
-          ? { ...n, folderId, category: folder ? folder.name : n.category }
+          ? {
+              ...n,
+              folderId: folderId ?? undefined,
+              category: folder ? folder.name : n.category,
+            }
           : n,
       ),
     );
@@ -282,123 +281,20 @@ const MainView = () => {
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid maxWidth={400} className={styles.mainView__middlePanel}>
-            {currentView !== selectedView.TRASH && (
-              <ListItem disablePadding>
-                <ListItemButton
-                  onClick={handleNewNote}
-                  disabled={currentView === selectedView.SCRATCHPAD}
-                  divider
-                  sx={{ bgcolor: green[900] }}
-                >
-                  <ListItemIcon>
-                    <AddIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="New note" />
-                </ListItemButton>
-              </ListItem>
-            )}
-            {currentView === selectedView.NOTES &&
-              notes
-                .filter((card) => !card.isTrash)
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.FAVORITES &&
-              notes
-                .filter((card) => card.isFav && !card.isTrash)
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.FOLDERS &&
-              selectedFolderId &&
-              notes
-                .filter(
-                  (note) => note.folderId === selectedFolderId && !note.isTrash,
-                )
-                .map(
-                  (card) =>
-                    card && (
-                      <CustomCard
-                        key={card.id}
-                        id={card.id}
-                        text={card.text}
-                        category={card.category}
-                        isFav={card.isFav}
-                        onFav={handleFavNote}
-                        onTrash={handleTrashNote}
-                        onMoveToFolder={handleMoveNoteToFolder}
-                        folders={folders}
-                        folderId={card.folderId}
-                        onSelect={setSelectedNoteId}
-                        selected={selectedNoteId === card.id}
-                      />
-                    ),
-                )}
-            {currentView === selectedView.TRASH && (
-              <>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => setOpenEmptyTrashDialog(true)}
-                    divider
-                    sx={{ bgcolor: red[900] }}
-                  >
-                    <ListItemIcon>
-                      <DeleteIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Empty Trash" />
-                  </ListItemButton>
-                </ListItem>
-                {notes
-                  .filter((card) => card.isTrash)
-                  .map(
-                    (card) =>
-                      card && (
-                        <CustomCard
-                          key={card.id}
-                          id={card.id}
-                          text={card.text}
-                          category={card.category}
-                          isTrash={card.isTrash}
-                          onRestore={handleRestoreNote}
-                          onSelect={setSelectedNoteId}
-                          selected={selectedNoteId === card.id}
-                        />
-                      ),
-                  )}
-              </>
-            )}
+            <MiddlePanel
+              currentView={currentView}
+              notes={notes}
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              selectedNoteId={selectedNoteId}
+              onNewNote={handleNewNote}
+              onFavNote={handleFavNote}
+              onTrashNote={handleTrashNote}
+              onMoveNoteToFolder={handleMoveNoteToFolder}
+              onRestoreNote={handleRestoreNote}
+              onCardSelect={setSelectedNoteId}
+              onEmptyTrash={() => setOpenEmptyTrashDialog(true)}
+            />
           </Grid>
         )}
         {(selectedNoteId || currentView === selectedView.SCRATCHPAD) && (
