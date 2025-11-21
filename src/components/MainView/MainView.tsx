@@ -298,7 +298,7 @@ const MainView = () => {
           </Grid>
         )}
         {(selectedNoteId || currentView === selectedView.SCRATCHPAD) && (
-          <Grid className={styles.mainView__rightPanel}>
+          <Grid size="grow" className={styles.mainView__rightPanel}>
             <Tiptap
               content={textAreaValue}
               onChange={handleEditorChange}
