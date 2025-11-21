@@ -7,13 +7,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   List,
   Divider,
@@ -55,6 +48,9 @@ import { selectedView, type SelectedView } from "../../utils/selectedView";
 import { storageKeys } from "../../utils/storageKeys";
 import CustomCard from "../Card/Card";
 import Tiptap from "../TextEditor/TipTap";
+import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
+import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
+import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
 
 // styles
 import styles from "./MainView.module.scss";
@@ -114,7 +110,7 @@ const MainView = () => {
   );
   const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
 
-  const [open, setOpen] = useState(false);
+  const [openCreateFolderDialog, setOpenCreateFolderDialog] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
@@ -152,11 +148,11 @@ const MainView = () => {
   }, [selectedNoteId, notes, scratchpadValue]);
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpenCreateFolderDialog(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenCreateFolderDialog(false);
     setFolderName("");
   };
 
@@ -508,73 +504,27 @@ const MainView = () => {
           </Grid>
         )}
       </Grid>
-      <Dialog open={open} onClose={handleClose}>
-        <form onSubmit={handleAddFolder}>
-          <DialogTitle>Add Folder</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Please enter the name for the new folder.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="folderName"
-              name="folderName"
-              label="Folder Name"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={folderName}
-              onChange={handleFolderNameChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Add</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Delete Folder</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {`Are you sure you want to delete the folder "${
-              folderToDelete?.name ?? ""
-            }"? This action cannot be undone.`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-          <Button onClick={handleConfirmDeleteFolder} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={openEmptyTrashDialog}
+      <CreateFolderDialog
+        isOpen={openCreateFolderDialog}
+        folderName={folderName}
+        onFolderNameChange={handleFolderNameChange}
+        onAddFolder={handleAddFolder}
+        onClose={handleClose}
+      />
+      <DeleteFolderDialog
+        isOpen={openDeleteDialog}
+        folderName={folderToDelete?.name}
+        onDeleteFolder={handleConfirmDeleteFolder}
+        onClose={handleCloseDeleteDialog}
+      />
+      <EmptyTrashDialog
+        isOpen={openEmptyTrashDialog}
+        onEmptyTrash={() => {
+          setNotes(notes.filter((n) => !n.isTrash));
+          setOpenEmptyTrashDialog(false);
+        }}
         onClose={() => setOpenEmptyTrashDialog(false)}
-      >
-        <DialogTitle>Empty Trash</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to permanently delete all notes in the trash?
-            This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEmptyTrashDialog(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              setNotes(notes.filter((n) => !n.isTrash));
-              setOpenEmptyTrashDialog(false);
-            }}
-            color="error"
-          >
-            Empty Trash
-          </Button>
-        </DialogActions>
-      </Dialog>
+      />
     </div>
   );
 };
