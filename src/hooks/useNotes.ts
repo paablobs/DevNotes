@@ -26,7 +26,10 @@ const useNotes = () => {
     storageKeys.FOLDERS,
     [],
   );
-  const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
+  const [notes, setNotes] = useLocalStorage<Record<string, Note>>(
+    storageKeys.NOTES,
+    {},
+  );
 
   const addNote = (currentView: string, selectedFolderId?: string) => {
     let category = DEFAULT_CATEGORY;
@@ -44,7 +47,7 @@ const useNotes = () => {
         ? { folderId: selectedFolderId }
         : {}),
     };
-    setNotes([newNote, ...notes]);
+    setNotes({ ...notes, [newNote.id]: newNote });
     return newNote.id;
   };
 
@@ -62,24 +65,29 @@ const useNotes = () => {
   const deleteFolder = (id: string) => {
     setFolders(folders.filter((folder) => folder.id !== id));
     setNotes(
-      notes.map((note) =>
-        note.folderId === id
-          ? {
-              ...note,
-              isTrash: true,
-              folderId: undefined,
-              category: DEFAULT_CATEGORY,
-            }
-          : note,
+      Object.fromEntries(
+        Object.entries(notes).map(([noteId, note]) =>
+          note.folderId === id
+            ? [
+                noteId,
+                {
+                  ...note,
+                  isTrash: true,
+                  folderId: undefined,
+                  category: DEFAULT_CATEGORY,
+                },
+              ]
+            : [noteId, note],
+        ),
       ),
     );
   };
 
   const addFavorite = (id: string) => {
-    const note = notes.find((note) => note.id === id);
+    const note = notes[id];
     if (note) {
       const updatedNote = { ...note, isFav: !note.isFav };
-      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
+      setNotes({ ...notes, [id]: updatedNote });
     }
   };
 
@@ -87,43 +95,53 @@ const useNotes = () => {
     const folder = folderId
       ? folders.find((f) => f.id === folderId)
       : undefined;
-    setNotes(
-      notes.map((n) =>
-        n.id === noteId
-          ? {
-              ...n,
-              folderId: folderId ?? undefined,
-              category: folder ? folder.name : n.category,
-            }
-          : n,
-      ),
-    );
+    const note = notes[noteId];
+    if (note) {
+      const updatedNote = {
+        ...note,
+        folderId: folderId ?? undefined,
+        category: folder ? folder.name : note.category,
+      };
+      setNotes({ ...notes, [noteId]: updatedNote });
+    }
   };
 
   const deleteNotes = (ids: string[], permanent = false) => {
     if (permanent) {
-      setNotes(notes.filter((n) => !ids.includes(n.id)));
+      const updatedNotes = { ...notes };
+      ids.forEach((id) => {
+        delete updatedNotes[id];
+      });
+      setNotes(updatedNotes);
     } else {
-      setNotes(
-        notes.map((n) => (ids.includes(n.id) ? { ...n, isTrash: true } : n)),
-      );
+      const updatedNotes = { ...notes };
+      ids.forEach((id) => {
+        if (updatedNotes[id]) {
+          updatedNotes[id] = { ...updatedNotes[id], isTrash: true };
+        }
+      });
+      setNotes(updatedNotes);
     }
   };
 
   const restoreNote = (id: string) => {
-    const note = notes.find((n) => n.id === id && n.isTrash);
-    if (note) {
+    const note = notes[id];
+    if (note && note.isTrash) {
       const restoredNote = { ...note, isTrash: false };
-      setNotes(notes.map((n) => (n.id === id ? restoredNote : n)));
+      setNotes({ ...notes, [id]: restoredNote });
     }
   };
 
   const getNoteById = (id: string) => {
-    return notes.find((n) => n.id === id) || null;
+    return notes[id] || null;
   };
 
   const updateNoteText = (id: string, text: string) => {
-    setNotes(notes.map((n) => (n.id === id ? { ...n, text } : n)));
+    const note = notes[id];
+    if (note) {
+      const updatedNote = { ...note, text };
+      setNotes({ ...notes, [id]: updatedNote });
+    }
   };
 
   return {

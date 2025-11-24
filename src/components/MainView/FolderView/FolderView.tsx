@@ -18,7 +18,7 @@ interface Folder {
 
 interface MiddlePanelProps {
   currentView: SelectedView;
-  notes: Note[];
+  notes: Record<string, Note>;
   folders: Folder[];
   selectedFolderId: string | null;
   selectedNoteId: string | null;
@@ -63,7 +63,7 @@ const FolderView = ({
         </ListItem>
       )}
       {currentView === selectedView.NOTES &&
-        notes
+        Object.values(notes)
           .filter((card) => !card.isTrash)
           .map(
             (card) =>
@@ -87,7 +87,7 @@ const FolderView = ({
               ),
           )}
       {currentView === selectedView.FAVORITES &&
-        notes
+        Object.values(notes)
           .filter((card) => card.isFav && !card.isTrash)
           .map(
             (card) =>
@@ -112,7 +112,7 @@ const FolderView = ({
           )}
       {currentView === selectedView.FOLDERS &&
         selectedFolderId &&
-        notes
+        Object.values(notes)
           .filter((note) => note.folderId === selectedFolderId && !note.isTrash)
           .map(
             (card) =>
@@ -149,7 +149,7 @@ const FolderView = ({
               <ListItemText primary="Empty Trash" />
             </ListItemButton>
           </ListItem>
-          {notes
+          {Object.values(notes)
             .filter((card) => card.isTrash)
             .map(
               (card) =>

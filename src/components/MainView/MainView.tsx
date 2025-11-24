@@ -51,15 +51,26 @@ const MainView = () => {
       if (view === selectedView.SCRATCHPAD) {
         setSelectedNoteId(null);
       } else if (view === selectedView.NOTES) {
-        setSelectedNoteId(notes.find((n) => !n.isTrash)?.id || null);
-      } else if (view === selectedView.FAVORITES) {
-        setSelectedNoteId(notes.find((n) => n.isFav && !n.isTrash)?.id || null);
-      } else if (view === selectedView.TRASH) {
-        setSelectedNoteId(notes.find((n) => n.isTrash)?.id || null);
-      } else if (view === selectedView.FOLDERS && folderId) {
-        const firstFolderNote = notes.find(
-          (note) => note.folderId === folderId && !note.isTrash,
+        setSelectedNoteId(
+          Object.keys(notes).find((id) => !notes[id].isTrash) || null,
         );
+      } else if (view === selectedView.FAVORITES) {
+        setSelectedNoteId(
+          Object.keys(notes).find(
+            (id) => notes[id].isFav && !notes[id].isTrash,
+          ) || null,
+        );
+      } else if (view === selectedView.TRASH) {
+        setSelectedNoteId(
+          Object.keys(notes).find((id) => notes[id].isTrash) || null,
+        );
+      } else if (view === selectedView.FOLDERS && folderId) {
+        const firstFolderNoteId = Object.keys(notes).find(
+          (id) => notes[id].folderId === folderId && !notes[id].isTrash,
+        );
+        const firstFolderNote = firstFolderNoteId
+          ? notes[firstFolderNoteId]
+          : null;
         setSelectedNoteId(firstFolderNote ? firstFolderNote.id : null);
       }
     },
@@ -214,10 +225,10 @@ const MainView = () => {
       <EmptyTrashDialog
         isOpen={openEmptyTrashDialog}
         onEmptyTrash={() => {
-          deleteNotes(
-            notes.filter((note) => note.isTrash).map((n) => n.id),
-            true,
+          const trashNoteIds = Object.keys(notes).filter(
+            (id) => notes[id].isTrash,
           );
+          deleteNotes(trashNoteIds, true);
           setOpenEmptyTrashDialog(false);
         }}
         onClose={() => setOpenEmptyTrashDialog(false)}
