@@ -75,7 +75,6 @@ const MainView = () => {
     setOpenCreateFolderDialog(true);
   };
 
-  // Close Create Folder Dialog - Necessary for the Dialog MUI component
   const handleClose = () => {
     setOpenCreateFolderDialog(false);
   };
