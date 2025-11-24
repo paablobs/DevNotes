@@ -10,12 +10,12 @@ import Tiptap from "../TextEditor/TipTap";
 import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
 import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
 import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
-import LeftPanel from "./LeftPanel/LeftPanel";
+import Sidebar from "./Sidebar/Sidebar";
+import FolderView from "./FolderView/FolderView";
+import useNotes from "../../hooks/useNotes";
 
 // styles
-import useNotes from "../../hooks/useNotes";
 import styles from "./MainView.module.scss";
-import MiddlePanel from "./MiddlePanel/MiddlePanel";
 
 export interface Note {
   id: string;
@@ -177,7 +177,7 @@ const MainView = () => {
       <Grid container spacing={0} className={styles.mainView__gridContainer}>
         <Grid width={300}>
           <div className={styles.mainView__leftPanel}>
-            <LeftPanel
+            <Sidebar
               currentView={currentView}
               selectedFolderId={selectedFolderId}
               folders={folders}
@@ -190,7 +190,7 @@ const MainView = () => {
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
           <Grid maxWidth={400} className={styles.mainView__middlePanel}>
-            <MiddlePanel
+            <FolderView
               currentView={currentView}
               notes={notes}
               folders={folders}

@@ -36,7 +36,7 @@ interface LeftPanelProps {
   onDeleteFolder: (folder: Folder) => void;
 }
 
-const LeftPanel = ({
+const Sidebar = ({
   currentView,
   selectedFolderId,
   folders,
@@ -138,4 +138,4 @@ const LeftPanel = ({
   );
 };
 
-export default LeftPanel;
+export default Sidebar;

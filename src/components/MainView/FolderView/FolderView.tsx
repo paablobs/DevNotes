@@ -31,7 +31,7 @@ interface MiddlePanelProps {
   onEmptyTrash?: () => void;
 }
 
-const MiddlePanel = ({
+const FolderView = ({
   currentView,
   notes,
   folders,
@@ -176,4 +176,4 @@ const MiddlePanel = ({
   );
 };
 
-export default MiddlePanel;
+export default FolderView;
