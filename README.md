@@ -1,6 +1,6 @@
-# DevNotes — Offline-first Rich Text Notes
+# Nout — Offline-first Rich Text Notes
 
-DevNotes is a compact, offline-first note-taking web app built with React, TypeScript and Vite. It combines a lightweight local-first data layer with a polished UI and a rich-text editor (TipTap) so you can create, organize and edit notes with no backend required.
+Nout is a compact, offline-first note-taking web app built with React, TypeScript and Vite. It combines a lightweight local-first data layer with a polished UI and a rich-text editor (TipTap) so you can create, organize and edit notes with no backend required.
 
 Features
 

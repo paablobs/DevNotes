@@ -1,0 +1,66 @@
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  TextField,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import { useState } from "react";
+
+interface CreateFolderDialogProps {
+  isOpen: boolean;
+  onAddFolder: (folderName: string) => void;
+  onClose: () => void;
+}
+
+const CreateFolderDialog = ({
+  isOpen,
+  onAddFolder,
+  onClose,
+}: CreateFolderDialogProps) => {
+  const [folderName, setFolderName] = useState("");
+  const handleClose = () => {
+    onClose();
+    setFolderName("");
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onAddFolder(folderName);
+    handleClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Add Folder</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the name for the new folder.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="folderName"
+            name="folderName"
+            label="Folder Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit">Add</Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
+export default CreateFolderDialog;
