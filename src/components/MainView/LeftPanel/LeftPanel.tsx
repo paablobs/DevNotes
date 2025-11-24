@@ -48,7 +48,7 @@ const LeftPanel = ({
   return (
     <List>
       <ListItem>
-        <ListItemText>DevNotes</ListItemText>
+        <ListItemText>Nout</ListItemText>
       </ListItem>
       <ListItem disablePadding>
         <ListItemButton

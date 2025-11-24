@@ -1,39 +1,19 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
 // Components & Icons
 import { Grid } from "@mui/material";
-import {
-  green,
-  red,
-  amber,
-  blue,
-  blueGrey,
-  cyan,
-  deepOrange,
-  deepPurple,
-  lightBlue,
-  lightGreen,
-  indigo,
-  lime,
-  orange,
-  pink,
-  purple,
-  teal,
-  yellow,
-} from "@mui/material/colors";
-import { v4 as uuidv4 } from "uuid";
 
 // Custom Hooks & Styles & Components
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { selectedView, type SelectedView } from "../../utils/selectedView";
-import { storageKeys } from "../../utils/storageKeys";
 import Tiptap from "../TextEditor/TipTap";
-import LeftPanel from "./LeftPanel/LeftPanel";
 import CreateFolderDialog from "./CreateFolderDialog/CreateFolderDialog";
 import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
 import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
+import LeftPanel from "./LeftPanel/LeftPanel";
 
 // styles
+import useNotes from "../../hooks/useNotes";
 import styles from "./MainView.module.scss";
 import MiddlePanel from "./MiddlePanel/MiddlePanel";
 
@@ -52,48 +32,8 @@ interface Folder {
   color?: string;
 }
 
-type ColorShades = { [shade: string]: string };
-
-const colorPalette: ColorShades[] = [
-  yellow,
-  green,
-  red,
-  amber,
-  blue,
-  blueGrey,
-  cyan,
-  deepOrange,
-  deepPurple,
-  lightBlue,
-  lightGreen,
-  indigo,
-  lime,
-  orange,
-  pink,
-  purple,
-  teal,
-];
-
-const randomColor = (): string => {
-  const colObj = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-  const preferredShades = [500, 600, 400, 700, 300, 200, 50];
-  for (const s of preferredShades) {
-    const key = String(s);
-    if (colObj[key]) return colObj[key];
-  }
-  const vals = Object.values(colObj);
-  return typeof vals[0] === "string" ? vals[0] : "#FFC107";
-};
-
 const MainView = () => {
-  const [folders, setFolders] = useLocalStorage<Folder[]>(
-    storageKeys.FOLDERS,
-    [],
-  );
-  const [notes, setNotes] = useLocalStorage<Note[]>(storageKeys.NOTES, []);
-
   const [openCreateFolderDialog, setOpenCreateFolderDialog] = useState(false);
-  const [folderName, setFolderName] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<null | Folder>(null);
   const [openEmptyTrashDialog, setOpenEmptyTrashDialog] = useState(false);
@@ -104,56 +44,59 @@ const MainView = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [scratchpadValue, setScratchpadValue] = useLocalStorage<string>(
     "scratchpad",
-    "Welcome to DevNotes!\n\nThis is your scratchpad. You can write down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
+    "Welcome to Nout!\n\nThis is your scratchpad. You can write down quick notes here that won't be saved permanently.\n\nFeel free to type anything you want, and it will be saved automatically as you type.",
   );
 
-  const getSelectedNote = () =>
-    notes.find((n) => n.id === selectedNoteId) || null;
+  const {
+    notes,
+    folders,
+    addNote,
+    addFolder,
+    deleteFolder,
+    addFavorite,
+    moveNoteToFolder,
+    deleteNotes,
+    restoreNote,
+    getNoteById,
+    updateNoteText,
+  } = useNotes();
 
-  const getTextAreaValue = () => {
-    if (currentView === selectedView.SCRATCHPAD) return scratchpadValue;
-    const note = getSelectedNote();
-    return note ? note.text : "";
-  };
-
-  const [textAreaValue, setTextAreaValue] = useState(getTextAreaValue());
+  const selectInitialNote = useEffectEvent(
+    (view = currentView, folderId = selectedFolderId) => {
+      if (view === selectedView.SCRATCHPAD) {
+        setSelectedNoteId(null);
+      } else if (view === selectedView.NOTES) {
+        setSelectedNoteId(notes.find((n) => !n.isTrash)?.id || null);
+      } else if (view === selectedView.FAVORITES) {
+        setSelectedNoteId(notes.find((n) => n.isFav && !n.isTrash)?.id || null);
+      } else if (view === selectedView.TRASH) {
+        setSelectedNoteId(notes.find((n) => n.isTrash)?.id || null);
+      } else if (view === selectedView.FOLDERS && folderId) {
+        const firstFolderNote = notes.find(
+          (note) => note.folderId === folderId && !note.isTrash,
+        );
+        setSelectedNoteId(firstFolderNote ? firstFolderNote.id : null);
+      }
+    },
+  );
 
   useEffect(() => {
-    if (currentView !== selectedView.SCRATCHPAD) {
-      setSelectedNoteId(null);
-    }
-    setTextAreaValue(getTextAreaValue());
-  }, [currentView]);
+    selectInitialNote();
+  }, []);
 
-  useEffect(() => {
-    setTextAreaValue(getTextAreaValue());
-  }, [selectedNoteId, notes, scratchpadValue]);
+  const getSelectedNote = () => getNoteById(selectedNoteId || "") || null;
 
   const handleClickOpen = () => {
     setOpenCreateFolderDialog(true);
   };
 
+  // Close Create Folder Dialog - Necessary for the Dialog MUI component
   const handleClose = () => {
     setOpenCreateFolderDialog(false);
-    setFolderName("");
   };
 
-  const handleFolderNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFolderName(event.target.value);
-  };
-
-  const handleAddFolder = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (folderName.trim()) {
-      const newFolder: Folder = {
-        id: uuidv4(),
-        name: folderName.trim(),
-        color: randomColor(),
-      };
-      setFolders([newFolder, ...folders]);
-      setFolderName("");
-    }
-    handleClose();
+  const handleAddFolder = (folderName: string) => {
+    addFolder(folderName);
   };
 
   const handleOpenDeleteDialog = (folder: Folder) => {
@@ -174,93 +117,59 @@ const MainView = () => {
   };
 
   const handleDeleteFolder = (id: string) => {
-    setFolders(folders.filter((folder) => folder.id !== id));
-    setNotes(
-      notes.map((note) =>
-        note.folderId === id
-          ? {
-              ...note,
-              isTrash: true,
-              folderId: undefined,
-              category: "All notes",
-            }
-          : note,
-      ),
-    );
+    deleteFolder(id);
     setSelectedFolderId(null);
   };
 
   const handleNewNote = () => {
-    let category = "All notes";
-    if (currentView === selectedView.FOLDERS && selectedFolderId) {
-      const folder = folders.find((f) => f.id === selectedFolderId);
-      if (folder) category = folder.name;
-    }
-    const newNote: Note = {
-      id: uuidv4(),
-      text: "",
-      category,
-      isFav: currentView === selectedView.FAVORITES,
-      isTrash: false,
-      ...(currentView === selectedView.FOLDERS && selectedFolderId
-        ? { folderId: selectedFolderId }
-        : {}),
-    };
-    setNotes([newNote, ...notes]);
-    setSelectedNoteId(newNote.id);
+    const noteId = addNote(currentView, selectedFolderId || undefined);
+    setSelectedNoteId(noteId);
   };
 
   const handleFavNote = (id: string) => {
-    const note = notes.find((note) => note.id === id);
-    if (note) {
-      const updatedNote = { ...note, isFav: !note.isFav };
-      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
-    }
+    addFavorite(id);
   };
 
   const handleMoveNoteToFolder = (noteId: string, folderId: string | null) => {
-    const folder = folderId
-      ? folders.find((f) => f.id === folderId)
-      : undefined;
-    setNotes(
-      notes.map((n) =>
-        n.id === noteId
-          ? {
-              ...n,
-              folderId: folderId ?? undefined,
-              category: folder ? folder.name : n.category,
-            }
-          : n,
-      ),
-    );
+    moveNoteToFolder(noteId, folderId);
   };
 
   const handleTrashNote = (id: string) => {
-    const note = notes.find((note) => note.id === id);
-    if (note) {
-      const updatedNote = { ...note, isTrash: true };
-      setNotes(notes.map((n) => (n.id === id ? updatedNote : n)));
-    }
+    deleteNotes([id]);
     setSelectedNoteId(null);
   };
 
   const handleRestoreNote = (id: string) => {
-    const note = notes.find((n) => n.id === id && n.isTrash);
-    if (note) {
-      const restoredNote = { ...note, isTrash: false };
-      setNotes(notes.map((n) => (n.id === id ? restoredNote : n)));
-    }
+    restoreNote(id);
   };
 
   const handleEditorChange = (value: string) => {
-    setTextAreaValue(value);
     if (currentView === selectedView.SCRATCHPAD) {
       setScratchpadValue(value);
     } else if (selectedNoteId) {
-      setNotes(
-        notes.map((n) => (n.id === selectedNoteId ? { ...n, text: value } : n)),
-      );
+      updateNoteText(selectedNoteId, value);
     }
+  };
+
+  const getEditorContent = () => {
+    if (currentView === selectedView.SCRATCHPAD) {
+      return scratchpadValue;
+    } else {
+      const note = getSelectedNote();
+      return note ? note.text : "";
+    }
+  };
+
+  const handleViewChange = (view: SelectedView) => {
+    setCurrentView(view);
+    if (view !== selectedView.FOLDERS) {
+      selectInitialNote(view);
+    }
+  };
+
+  const handleFolderSelect = (folderId: string) => {
+    setSelectedFolderId(folderId);
+    selectInitialNote(selectedView.FOLDERS, folderId);
   };
 
   return (
@@ -272,8 +181,8 @@ const MainView = () => {
               currentView={currentView}
               selectedFolderId={selectedFolderId}
               folders={folders}
-              onViewChange={setCurrentView}
-              onFolderSelect={setSelectedFolderId}
+              onViewChange={handleViewChange}
+              onFolderSelect={handleFolderSelect}
               onAddFolder={handleClickOpen}
               onDeleteFolder={handleOpenDeleteDialog}
             />
@@ -300,7 +209,7 @@ const MainView = () => {
         {(selectedNoteId || currentView === selectedView.SCRATCHPAD) && (
           <Grid size="grow" className={styles.mainView__rightPanel}>
             <Tiptap
-              content={textAreaValue}
+              content={getEditorContent()}
               onChange={handleEditorChange}
               editable={currentView !== selectedView.TRASH}
             />
@@ -309,8 +218,6 @@ const MainView = () => {
       </Grid>
       <CreateFolderDialog
         isOpen={openCreateFolderDialog}
-        folderName={folderName}
-        onFolderNameChange={handleFolderNameChange}
         onAddFolder={handleAddFolder}
         onClose={handleClose}
       />
@@ -323,7 +230,10 @@ const MainView = () => {
       <EmptyTrashDialog
         isOpen={openEmptyTrashDialog}
         onEmptyTrash={() => {
-          setNotes(notes.filter((n) => !n.isTrash));
+          deleteNotes(
+            notes.filter((note) => note.isTrash).map((n) => n.id),
+            true,
+          );
           setOpenEmptyTrashDialog(false);
         }}
         onClose={() => setOpenEmptyTrashDialog(false)}
