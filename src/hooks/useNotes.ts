@@ -4,13 +4,13 @@ import { useLocalStorage } from "./useLocalStorage";
 import { v4 as uuidv4 } from "uuid";
 import randomColor from "../utils/randomColor";
 
-interface Folder {
+export interface Folder {
   id: string;
   name: string;
   color?: string;
 }
 
-interface Note {
+export interface Note {
   id: string;
   text: string;
   category: string;

@@ -12,25 +12,10 @@ import DeleteFolderDialog from "./DeleteFolderDialog/DeleteFolderDialog";
 import EmptyTrashDialog from "./EmptyTrashDialog/EmptyTrashDialog";
 import Sidebar from "./Sidebar/Sidebar";
 import FolderView from "./FolderView/FolderView";
-import useNotes from "../../hooks/useNotes";
+import useNotes, { type Folder } from "../../hooks/useNotes";
 
 // styles
 import styles from "./MainView.module.scss";
-
-export interface Note {
-  id: string;
-  text: string;
-  category: string;
-  isFav: boolean;
-  isTrash: boolean;
-  folderId?: string;
-}
-
-interface Folder {
-  id: string;
-  name: string;
-  color?: string;
-}
 
 const MainView = () => {
   const [openCreateFolderDialog, setOpenCreateFolderDialog] = useState(false);

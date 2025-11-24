@@ -8,7 +8,7 @@ import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
 import { green, red } from "@mui/material/colors";
 import { selectedView, type SelectedView } from "../../../utils/selectedView";
 import CustomCard from "../../Card/Card";
-import type { Note } from "../MainView";
+import type { Note } from "../../../hooks/useNotes";
 
 interface Folder {
   id: string;
