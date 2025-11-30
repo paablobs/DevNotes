@@ -1,11 +1,5 @@
-import {
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import { Delete as DeleteIcon, Add as AddIcon } from "@mui/icons-material";
-import { green, red } from "@mui/material/colors";
+import { Button, ListItem } from "@mui/material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 import { selectedView, type SelectedView } from "../../../utils/selectedView";
 import CustomCard from "../../Card/Card";
 import type { Note } from "../../../hooks/useNotes";
@@ -22,7 +16,6 @@ interface MiddlePanelProps {
   folders: Folder[];
   selectedFolderId: string | null;
   selectedNoteId: string | null;
-  onNewNote: () => void;
   onFavNote: (noteId: string) => void;
   onTrashNote: (noteId: string) => void;
   onMoveNoteToFolder: (noteId: string, folderId: string | null) => void;
@@ -37,7 +30,6 @@ const FolderView = ({
   folders,
   selectedFolderId,
   selectedNoteId,
-  onNewNote,
   onFavNote,
   onTrashNote,
   onMoveNoteToFolder,
@@ -47,21 +39,6 @@ const FolderView = ({
 }: MiddlePanelProps) => {
   return (
     <>
-      {currentView !== selectedView.TRASH && (
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={onNewNote}
-            disabled={currentView === selectedView.SCRATCHPAD}
-            divider
-            sx={{ bgcolor: green[900] }}
-          >
-            <ListItemIcon>
-              <AddIcon />
-            </ListItemIcon>
-            <ListItemText primary="New note" />
-          </ListItemButton>
-        </ListItem>
-      )}
       {currentView === selectedView.NOTES &&
         Object.values(notes)
           .filter((card) => !card.isTrash)
@@ -138,16 +115,20 @@ const FolderView = ({
       {currentView === selectedView.TRASH && (
         <>
           <ListItem disablePadding>
-            <ListItemButton
+            <Button
               onClick={onEmptyTrash}
-              divider
-              sx={{ bgcolor: red[900] }}
+              sx={{
+                borderRadius: 1,
+                textTransform: "none",
+              }}
+              color="error"
+              fullWidth
+              variant="contained"
+              startIcon={<DeleteIcon />}
+              size="large"
             >
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Empty Trash" />
-            </ListItemButton>
+              Empty Trash
+            </Button>
           </ListItem>
           {Object.values(notes)
             .filter((card) => card.isTrash)

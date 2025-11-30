@@ -6,6 +6,7 @@ import {
   IconButton,
   List,
   Divider,
+  Button,
 } from "@mui/material";
 import {
   DashboardCustomize as DashboardCustomizeIcon,
@@ -15,6 +16,8 @@ import {
   Clear as ClearIcon,
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
+  EditNote as NewNoteIcon,
+  Code as CodeIcon,
 } from "@mui/icons-material";
 import { yellow } from "@mui/material/colors";
 
@@ -34,6 +37,7 @@ interface LeftPanelProps {
   onFolderSelect: (folderId: string) => void;
   onAddFolder: () => void;
   onDeleteFolder: (folder: Folder) => void;
+  onNewNote: () => void;
 }
 
 const Sidebar = ({
@@ -44,11 +48,38 @@ const Sidebar = ({
   onFolderSelect,
   onAddFolder,
   onDeleteFolder,
+  onNewNote,
 }: LeftPanelProps) => {
   return (
     <List>
-      <ListItem>
-        <ListItemText>Nout</ListItemText>
+      <ListItem sx={{ paddingRight: 0, paddingTop: 0 }}>
+        <ListItemText
+          slotProps={{ primary: { fontSize: "2rem", fontWeight: "bold" } }}
+        >
+          <CodeIcon
+            sx={{
+              fontSize: "3rem",
+              marginRight: 1,
+              verticalAlign: "top",
+            }}
+          />
+          Nout
+        </ListItemText>
+        {currentView !== selectedView.TRASH && (
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={onNewNote}
+            sx={{
+              aspectRatio: "1 / 1",
+              minWidth: 0,
+              borderRadius: "50%",
+              padding: 1,
+            }}
+          >
+            <NewNoteIcon fontSize="large" />
+          </Button>
+        )}
       </ListItem>
       <ListItem disablePadding>
         <ListItemButton
