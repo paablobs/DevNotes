@@ -28,7 +28,7 @@ const EmptyTrashDialog = ({
     </DialogContent>
     <DialogActions>
       <Button onClick={onClose}>Cancel</Button>
-      <Button onClick={onEmptyTrash} color="error">
+      <Button onClick={onEmptyTrash} color="error" variant="contained">
         Empty Trash
       </Button>
     </DialogActions>

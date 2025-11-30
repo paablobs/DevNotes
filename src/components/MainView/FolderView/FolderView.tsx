@@ -1,11 +1,5 @@
-import {
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Button, ListItem } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import { red } from "@mui/material/colors";
 import { selectedView, type SelectedView } from "../../../utils/selectedView";
 import CustomCard from "../../Card/Card";
 import type { Note } from "../../../hooks/useNotes";
@@ -121,16 +115,20 @@ const FolderView = ({
       {currentView === selectedView.TRASH && (
         <>
           <ListItem disablePadding>
-            <ListItemButton
+            <Button
               onClick={onEmptyTrash}
-              divider
-              sx={{ bgcolor: red[900] }}
+              sx={{
+                borderRadius: 1,
+                textTransform: "none",
+              }}
+              color="error"
+              fullWidth
+              variant="contained"
+              startIcon={<DeleteIcon />}
+              size="large"
             >
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Empty Trash" />
-            </ListItemButton>
+              Empty Trash
+            </Button>
           </ListItem>
           {Object.values(notes)
             .filter((card) => card.isTrash)

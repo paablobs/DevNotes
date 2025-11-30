@@ -56,7 +56,9 @@ const CreateFolderDialog = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit">Add</Button>
+          <Button type="submit" variant="contained" color="secondary">
+            Add
+          </Button>
         </DialogActions>
       </form>
     </Dialog>
