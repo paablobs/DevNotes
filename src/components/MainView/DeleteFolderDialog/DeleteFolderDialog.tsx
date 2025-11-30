@@ -29,7 +29,7 @@ const DeleteFolderDialog = ({
     </DialogContent>
     <DialogActions>
       <Button onClick={onClose}>Cancel</Button>
-      <Button onClick={onDeleteFolder} color="error">
+      <Button onClick={onDeleteFolder} color="error" variant="contained">
         Delete
       </Button>
     </DialogActions>

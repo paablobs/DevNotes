@@ -13,16 +13,22 @@ function App() {
       background: {
         default: "#0a0908",
       },
-      // primary: theme.palette.augmentColor({
-      //   color: {
-      //     main: "#FF5733",
-      //   },
-      // }),
       secondary: theme.palette.augmentColor({
         color: {
-          main: "#588157",
+          main: "#2e442e",
         },
       }),
+      error: theme.palette.augmentColor({
+        color: {
+          main: "#942020",
+        },
+      }),
+    },
+    shape: {
+      borderRadius: 8,
+    },
+    typography: {
+      fontFamily: "'JetBrains Mono', monospace",
     },
     components: {
       MuiListItemButton: {
@@ -33,11 +39,9 @@ function App() {
           },
         },
       },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            borderRadius: 8,
-          },
+      MuiDialog: {
+        defaultProps: {
+          slotProps: { paper: { elevation: 2 } },
         },
       },
     },
