@@ -213,6 +213,7 @@ const MainView = () => {
               content={getEditorContent()}
               onChange={handleEditorChange}
               editable={currentView !== selectedView.TRASH}
+              key={selectedNoteId || selectedView.SCRATCHPAD}
             />
           </Grid>
         )}

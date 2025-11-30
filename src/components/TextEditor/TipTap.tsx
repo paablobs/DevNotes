@@ -33,7 +33,7 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
     ],
     content: content ?? "",
     editable,
-    autofocus: true,
+    autofocus: "end",
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML());
     },
