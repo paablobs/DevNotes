@@ -15,6 +15,7 @@
     overflow: auto;
     display: flex;
     flex-direction: column;
+    scrollbar-gutter: stable;
   }
 
   &__rightPanel {
