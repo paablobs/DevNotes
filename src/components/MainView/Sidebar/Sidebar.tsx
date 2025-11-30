@@ -65,21 +65,22 @@ const Sidebar = ({
           />
           Nout
         </ListItemText>
-        {currentView !== selectedView.TRASH && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={onNewNote}
-            sx={{
-              aspectRatio: "1 / 1",
-              minWidth: 0,
-              borderRadius: "50%",
-              padding: 1,
-            }}
-          >
-            <NewNoteIcon fontSize="large" />
-          </Button>
-        )}
+        {currentView !== selectedView.TRASH &&
+          currentView !== selectedView.SCRATCHPAD && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={onNewNote}
+              sx={{
+                aspectRatio: "1 / 1",
+                minWidth: 0,
+                borderRadius: "50%",
+                padding: 1,
+              }}
+            >
+              <NewNoteIcon fontSize="large" />
+            </Button>
+          )}
       </ListItem>
       <ListItem disablePadding>
         <ListItemButton
