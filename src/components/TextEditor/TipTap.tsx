@@ -3,6 +3,8 @@ import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
+import { all, createLowlight } from "lowlight";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 
 import { ColorHighlighter } from "./ColorHighlighter/ColorHighlighter";
 import { SmilieReplacer } from "./SmilieReplacer/SmilieReplacer";
@@ -14,6 +16,9 @@ interface TiptapProps {
   editable?: boolean;
 }
 
+// create a lowlight instance
+const lowlight = createLowlight(all);
+
 const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
   const editor = useEditor({
     extensions: [
@@ -22,6 +27,9 @@ const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
       Typography,
       ColorHighlighter,
       SmilieReplacer,
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
     ],
     content: content ?? "",
     editable,
