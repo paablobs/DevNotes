@@ -44,6 +44,11 @@ function App() {
           slotProps: { paper: { elevation: 2 } },
         },
       },
+      MuiMenu: {
+        defaultProps: {
+          elevation: 2,
+        },
+      },
     },
   });
 
