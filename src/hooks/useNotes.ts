@@ -47,7 +47,7 @@ const useNotes = () => {
         ? { folderId: selectedFolderId }
         : {}),
     };
-    setNotes({ ...notes, [newNote.id]: newNote });
+    setNotes({ [newNote.id]: newNote, ...notes });
     return newNote.id;
   };
 

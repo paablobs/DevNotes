@@ -169,7 +169,7 @@ const MainView = () => {
 
   return (
     <div className={styles.mainView}>
-      <Grid container spacing={0} className={styles.mainView__gridContainer}>
+      <Grid container spacing={3} className={styles.mainView__gridContainer}>
         <Grid width={300}>
           <div className={styles.mainView__leftPanel}>
             <Sidebar
@@ -180,18 +180,24 @@ const MainView = () => {
               onFolderSelect={handleFolderSelect}
               onAddFolder={handleClickOpen}
               onDeleteFolder={handleOpenDeleteDialog}
+              onNewNote={handleNewNote}
             />
           </div>
         </Grid>
         {currentView !== selectedView.SCRATCHPAD && (
-          <Grid maxWidth={400} className={styles.mainView__middlePanel}>
+          <Grid
+            maxWidth={400}
+            className={styles.mainView__middlePanel}
+            gap={1}
+            padding={1}
+            paddingX={0}
+          >
             <FolderView
               currentView={currentView}
               notes={notes}
               folders={folders}
               selectedFolderId={selectedFolderId}
               selectedNoteId={selectedNoteId}
-              onNewNote={handleNewNote}
               onFavNote={handleFavNote}
               onTrashNote={handleTrashNote}
               onMoveNoteToFolder={handleMoveNoteToFolder}

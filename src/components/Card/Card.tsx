@@ -17,6 +17,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 import styles from "./Card.module.scss";
+import { alpha } from "@mui/material";
 
 interface CustomCardProps {
   id: string;
@@ -71,6 +72,13 @@ const CustomCard = ({
         variant="outlined"
         onClick={onSelect ? () => onSelect(id) : undefined}
         data-active={selected ? "true" : undefined}
+        sx={
+          selected
+            ? (theme) => ({
+                backgroundColor: alpha(theme.palette.primary.main, 0.3),
+              })
+            : {}
+        }
       >
         <CardContent>
           <Typography variant="h5" component="div" className={styles.box__text}>
