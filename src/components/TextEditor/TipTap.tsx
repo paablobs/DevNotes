@@ -22,7 +22,9 @@ const lowlight = createLowlight(all);
 const Tiptap = ({ content, onChange, editable = true }: TiptapProps) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        link: { openOnClick: false },
+      }),
       Highlight,
       Typography,
       ColorHighlighter,
