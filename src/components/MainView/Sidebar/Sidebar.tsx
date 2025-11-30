@@ -17,6 +17,7 @@ import {
   Notes as NotesIcon,
   CreateNewFolder as CreateNewFolderIcon,
   EditNote as NewNoteIcon,
+  Code as CodeIcon,
 } from "@mui/icons-material";
 import { yellow } from "@mui/material/colors";
 
@@ -52,7 +53,18 @@ const Sidebar = ({
   return (
     <List>
       <ListItem sx={{ paddingRight: 0, paddingTop: 0 }}>
-        <ListItemText>Nout</ListItemText>
+        <ListItemText
+          slotProps={{ primary: { fontSize: "2rem", fontWeight: "bold" } }}
+        >
+          <CodeIcon
+            sx={{
+              fontSize: "3rem",
+              marginRight: 1,
+              verticalAlign: "top",
+            }}
+          />
+          Nout
+        </ListItemText>
         <Button
           variant="contained"
           color="secondary"
