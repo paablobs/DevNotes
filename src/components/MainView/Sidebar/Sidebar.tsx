@@ -7,6 +7,7 @@ import {
   List,
   Divider,
   Button,
+  Grid,
 } from "@mui/material";
 import {
   DashboardCustomize as DashboardCustomizeIcon,
@@ -51,122 +52,130 @@ const Sidebar = ({
   onNewNote,
 }: LeftPanelProps) => {
   return (
-    <List>
-      <ListItem sx={{ paddingRight: 0, paddingTop: 0 }}>
-        <ListItemText
-          slotProps={{ primary: { fontSize: "2rem", fontWeight: "bold" } }}
-        >
-          <CodeIcon
-            sx={{
-              fontSize: "3rem",
-              marginRight: 1,
-              verticalAlign: "top",
-            }}
-          />
-          Nout
-        </ListItemText>
-        {currentView !== selectedView.TRASH &&
-          currentView !== selectedView.SCRATCHPAD && (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={onNewNote}
-              sx={{
-                aspectRatio: "1 / 1",
-                minWidth: 0,
-                borderRadius: "50%",
-                padding: 1,
-              }}
+    <Grid container spacing={0} direction={"column"} height={"100%"}>
+      <Grid size="auto">
+        <List>
+          <ListItem sx={{ paddingRight: 0, paddingTop: 0 }}>
+            <ListItemText
+              slotProps={{ primary: { fontSize: "2rem", fontWeight: "bold" } }}
             >
-              <NewNoteIcon fontSize="large" />
-            </Button>
-          )}
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={currentView === selectedView.SCRATCHPAD}
-          onClick={() => onViewChange(selectedView.SCRATCHPAD)}
-        >
-          <ListItemIcon>
-            <DashboardCustomizeIcon />
-          </ListItemIcon>
-          <ListItemText primary="Scratchpad" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={currentView === selectedView.NOTES}
-          onClick={() => onViewChange(selectedView.NOTES)}
-        >
-          <ListItemIcon>
-            <NotesIcon />
-          </ListItemIcon>
-          <ListItemText primary="All notes" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={currentView === selectedView.FAVORITES}
-          onClick={() => onViewChange(selectedView.FAVORITES)}
-        >
-          <ListItemIcon>
-            <StarIcon sx={{ color: yellow[700] }} />
-          </ListItemIcon>
-          <ListItemText primary="Favorites" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton
-          selected={currentView === selectedView.TRASH}
-          onClick={() => onViewChange(selectedView.TRASH)}
-        >
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText primary="Trash" />
-        </ListItemButton>
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemButton onClick={onAddFolder}>
-          <ListItemIcon>
-            <CreateNewFolderIcon />
-          </ListItemIcon>
-          <ListItemText primary="Add folder" />
-        </ListItemButton>
-      </ListItem>
-      <Divider sx={{ margin: 2 }} />
-      {folders.map((folder) => (
-        <ListItem
-          key={folder.id}
-          disablePadding
-          secondaryAction={
-            <IconButton
-              edge="end"
-              onClick={() => onDeleteFolder(folder)}
-              aria-label="delete-folder"
+              <CodeIcon
+                sx={{
+                  fontSize: "3rem",
+                  marginRight: 1,
+                  verticalAlign: "top",
+                }}
+              />
+              Nout
+            </ListItemText>
+            {currentView !== selectedView.TRASH &&
+              currentView !== selectedView.SCRATCHPAD && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={onNewNote}
+                  sx={{
+                    aspectRatio: "1 / 1",
+                    minWidth: 0,
+                    borderRadius: "50%",
+                    padding: 1,
+                  }}
+                >
+                  <NewNoteIcon fontSize="large" />
+                </Button>
+              )}
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={currentView === selectedView.SCRATCHPAD}
+              onClick={() => onViewChange(selectedView.SCRATCHPAD)}
             >
-              <ClearIcon />
-            </IconButton>
-          }
-        >
-          <ListItemButton
-            selected={
-              currentView === selectedView.FOLDERS &&
-              selectedFolderId === folder.id
-            }
-            onClick={() => {
-              onViewChange(selectedView.FOLDERS);
-              onFolderSelect(folder.id);
-            }}
-          >
-            <ListItemIcon>
-              <FolderIcon sx={{ color: folder.color ?? yellow[500] }} />
-            </ListItemIcon>
-            <ListItemText primary={folder.name} />
-          </ListItemButton>
-        </ListItem>
-      ))}
-    </List>
+              <ListItemIcon>
+                <DashboardCustomizeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Scratchpad" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={currentView === selectedView.NOTES}
+              onClick={() => onViewChange(selectedView.NOTES)}
+            >
+              <ListItemIcon>
+                <NotesIcon />
+              </ListItemIcon>
+              <ListItemText primary="All notes" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={currentView === selectedView.FAVORITES}
+              onClick={() => onViewChange(selectedView.FAVORITES)}
+            >
+              <ListItemIcon>
+                <StarIcon sx={{ color: yellow[700] }} />
+              </ListItemIcon>
+              <ListItemText primary="Favorites" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              selected={currentView === selectedView.TRASH}
+              onClick={() => onViewChange(selectedView.TRASH)}
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Trash" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={onAddFolder}>
+              <ListItemIcon>
+                <CreateNewFolderIcon />
+              </ListItemIcon>
+              <ListItemText primary="Add folder" />
+            </ListItemButton>
+          </ListItem>
+          <Divider sx={{ margin: 2 }} />
+        </List>
+      </Grid>
+      <Grid size="grow" overflow={"auto"} sx={{ scrollbarGutter: "stable" }}>
+        <List>
+          {folders.map((folder) => (
+            <ListItem
+              key={folder.id}
+              disablePadding
+              secondaryAction={
+                <IconButton
+                  edge="end"
+                  onClick={() => onDeleteFolder(folder)}
+                  aria-label="delete-folder"
+                >
+                  <ClearIcon />
+                </IconButton>
+              }
+            >
+              <ListItemButton
+                selected={
+                  currentView === selectedView.FOLDERS &&
+                  selectedFolderId === folder.id
+                }
+                onClick={() => {
+                  onViewChange(selectedView.FOLDERS);
+                  onFolderSelect(folder.id);
+                }}
+              >
+                <ListItemIcon>
+                  <FolderIcon sx={{ color: folder.color ?? yellow[500] }} />
+                </ListItemIcon>
+                <ListItemText primary={folder.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Grid>
+    </Grid>
   );
 };
 
