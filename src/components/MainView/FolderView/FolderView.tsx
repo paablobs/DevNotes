@@ -22,6 +22,7 @@ interface MiddlePanelProps {
   onRestoreNote: (noteId: string) => void;
   onCardSelect?: (noteId: string) => void;
   onEmptyTrash?: () => void;
+  onHideNote: (noteId: string) => void;
 }
 
 const FolderView = ({
@@ -36,12 +37,13 @@ const FolderView = ({
   onRestoreNote,
   onCardSelect,
   onEmptyTrash,
+  onHideNote,
 }: MiddlePanelProps) => {
   return (
     <>
       {currentView === selectedView.NOTES &&
         Object.values(notes)
-          .filter((card) => !card.isTrash)
+          .filter((card) => !card.isTrash && !card.isHidden)
           .map(
             (card) =>
               card && (
@@ -53,6 +55,8 @@ const FolderView = ({
                   isFav={card.isFav}
                   onFav={() => onFavNote(card.id)}
                   onTrash={() => onTrashNote(card.id)}
+                  isHidden={card.isHidden}
+                  onHide={() => onHideNote(card.id)}
                   onMoveToFolder={onMoveNoteToFolder}
                   folders={folders}
                   folderId={card.folderId}
@@ -65,7 +69,7 @@ const FolderView = ({
           )}
       {currentView === selectedView.FAVORITES &&
         Object.values(notes)
-          .filter((card) => card.isFav && !card.isTrash)
+          .filter((card) => card.isFav && !card.isTrash && !card.isHidden)
           .map(
             (card) =>
               card && (
@@ -77,6 +81,8 @@ const FolderView = ({
                   isFav={card.isFav}
                   onFav={() => onFavNote(card.id)}
                   onTrash={() => onTrashNote(card.id)}
+                  isHidden={card.isHidden}
+                  onHide={() => onHideNote(card.id)}
                   onMoveToFolder={onMoveNoteToFolder}
                   folders={folders}
                   folderId={card.folderId}
@@ -102,6 +108,8 @@ const FolderView = ({
                   isFav={card.isFav}
                   onFav={() => onFavNote(card.id)}
                   onTrash={() => onTrashNote(card.id)}
+                  isHidden={card.isHidden}
+                  onHide={() => onHideNote(card.id)}
                   onMoveToFolder={onMoveNoteToFolder}
                   folders={folders}
                   folderId={card.folderId}

@@ -44,6 +44,7 @@ const MainView = () => {
     restoreNote,
     getNoteById,
     updateNoteText,
+    hideNote,
   } = useNotes();
 
   const selectInitialNote = useEffectEvent(
@@ -125,6 +126,10 @@ const MainView = () => {
     addFavorite(id);
   };
 
+  const handleHideNote = (id: string) => {
+    hideNote(id);
+  };
+
   const handleMoveNoteToFolder = (noteId: string, folderId: string | null) => {
     moveNoteToFolder(noteId, folderId);
   };
@@ -204,6 +209,7 @@ const MainView = () => {
               onRestoreNote={handleRestoreNote}
               onCardSelect={setSelectedNoteId}
               onEmptyTrash={() => setOpenEmptyTrashDialog(true)}
+              onHideNote={handleHideNote}
             />
           </Grid>
         )}

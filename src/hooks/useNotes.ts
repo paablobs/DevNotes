@@ -16,10 +16,11 @@ export interface Note {
   category: string;
   isFav: boolean;
   isTrash: boolean;
+  isHidden: boolean;
   folderId?: string;
 }
 
-const DEFAULT_CATEGORY = "All notes";
+export const DEFAULT_CATEGORY = "All notes";
 
 const useNotes = () => {
   const [folders, setFolders] = useLocalStorage<Folder[]>(
@@ -43,6 +44,7 @@ const useNotes = () => {
       category,
       isFav: currentView === selectedView.FAVORITES,
       isTrash: false,
+      isHidden: false,
       ...(currentView === selectedView.FOLDERS && selectedFolderId
         ? { folderId: selectedFolderId }
         : {}),
@@ -75,6 +77,7 @@ const useNotes = () => {
                   isTrash: true,
                   folderId: undefined,
                   category: DEFAULT_CATEGORY,
+                  isHidden: false,
                 },
               ]
             : [noteId, note],
@@ -127,7 +130,7 @@ const useNotes = () => {
   const restoreNote = (id: string) => {
     const note = notes[id];
     if (note && note.isTrash) {
-      const restoredNote = { ...note, isTrash: false };
+      const restoredNote = { ...note, isTrash: false, isHidden: false };
       setNotes({ ...notes, [id]: restoredNote });
     }
   };
@@ -144,6 +147,14 @@ const useNotes = () => {
     }
   };
 
+  const hideNote = (id: string) => {
+    const note = notes[id];
+    if (note) {
+      const updatedNote = { ...note, isHidden: !note.isHidden };
+      setNotes({ ...notes, [id]: updatedNote });
+    }
+  };
+
   return {
     notes,
     folders,
@@ -156,6 +167,7 @@ const useNotes = () => {
     restoreNote,
     getNoteById,
     updateNoteText,
+    hideNote,
   };
 };
 

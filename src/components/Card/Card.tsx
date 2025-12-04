@@ -11,13 +11,15 @@ import {
   RestoreOutlined as RestoreIcon,
   DeleteOutlineOutlined as DeleteOutlineIcon,
   DriveFileMoveOutlined as MoveToFolderIcon,
+  PendingOutlined as ThreeDotMenuIcon,
 } from "@mui/icons-material";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
-import styles from "./Card.module.scss";
 import { alpha } from "@mui/material";
+
+import { DEFAULT_CATEGORY } from "../../hooks/useNotes";
+import styles from "./Card.module.scss";
 
 interface CustomCardProps {
   id: string;
@@ -25,9 +27,11 @@ interface CustomCardProps {
   category: string;
   isFav?: boolean;
   isTrash?: boolean;
+  isHidden?: boolean;
   onFav?: (id: string) => void;
   onTrash?: (id: string) => void;
   onRestore?: (id: string) => void;
+  onHide?: (id: string) => void;
   folders?: { id: string; name: string; color?: string }[];
   onMoveToFolder?: (noteId: string, folderId: string) => void;
   folderId?: string | null;
@@ -41,9 +45,11 @@ const CustomCard = ({
   category,
   isFav,
   isTrash,
+  isHidden,
   onFav,
   onTrash,
   onRestore,
+  onHide,
   folders,
   onMoveToFolder,
   folderId,
@@ -64,6 +70,66 @@ const CustomCard = ({
       .filter(Boolean);
     return lines.length ? lines[0] : "New note";
   };
+
+  const moveToFolderPopup = () => (
+    <PopupState variant="popover" popupId={`move-folder-popup-${id}`}>
+      {(popupState) => {
+        const availableFolders = (folders || []).filter(
+          (f) => f.id !== folderId,
+        );
+        return (
+          <>
+            <IconButton {...bindTrigger(popupState)}>
+              <MoveToFolderIcon />
+            </IconButton>
+            <Menu {...bindMenu(popupState)}>
+              {availableFolders.length > 0 ? (
+                availableFolders.map((folder: { id: string; name: string }) => (
+                  <MenuItem
+                    key={folder.id}
+                    onClick={() => {
+                      popupState.close();
+                      if (onMoveToFolder) onMoveToFolder(id, folder.id);
+                    }}
+                  >
+                    {folder.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>There are no folders</MenuItem>
+              )}
+            </Menu>
+          </>
+        );
+      }}
+    </PopupState>
+  );
+
+  const hideFromAllNotesPopup = () => (
+    <PopupState variant="popover" popupId={`hide-from-notes-${id}`}>
+      {(popupState) => {
+        return (
+          <>
+            <IconButton {...bindTrigger(popupState)}>
+              <ThreeDotMenuIcon />
+            </IconButton>
+            <Menu {...bindMenu(popupState)}>
+              <MenuItem
+                onClick={() => {
+                  popupState.close();
+                  if (onHide) onHide(id);
+                }}
+              >
+                {!isHidden
+                  ? `Hide from ${DEFAULT_CATEGORY}`
+                  : `Show in ${DEFAULT_CATEGORY}`}
+              </MenuItem>
+            </Menu>
+          </>
+        );
+      }}
+    </PopupState>
+  );
 
   return (
     <Box className={styles.box}>
@@ -98,40 +164,8 @@ const CustomCard = ({
                   <StarredIcon />
                 )}
               </IconButton>
-              <PopupState variant="popover" popupId={`move-folder-popup-${id}`}>
-                {(popupState) => {
-                  const availableFolders = (folders || []).filter(
-                    (f) => f.id !== folderId,
-                  );
-                  return (
-                    <>
-                      <IconButton {...bindTrigger(popupState)}>
-                        <MoveToFolderIcon />
-                      </IconButton>
-                      <Menu {...bindMenu(popupState)}>
-                        {availableFolders.length > 0 ? (
-                          availableFolders.map(
-                            (folder: { id: string; name: string }) => (
-                              <MenuItem
-                                key={folder.id}
-                                onClick={() => {
-                                  popupState.close();
-                                  if (onMoveToFolder)
-                                    onMoveToFolder(id, folder.id);
-                                }}
-                              >
-                                {folder.name}
-                              </MenuItem>
-                            ),
-                          )
-                        ) : (
-                          <MenuItem disabled>There are no folders</MenuItem>
-                        )}
-                      </Menu>
-                    </>
-                  );
-                }}
-              </PopupState>
+              {moveToFolderPopup()}
+              {category !== DEFAULT_CATEGORY ? hideFromAllNotesPopup() : null}
               <IconButton
                 onClick={
                   onTrash
