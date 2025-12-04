@@ -8,9 +8,9 @@ import { yellow } from "@mui/material/colors";
 import {
   Star as StarIcon,
   StarBorder as StarredIcon,
-  Restore as RestoreIcon,
-  DeleteOutline as DeleteOutlineIcon,
-  DriveFileMove as MoveToFolderIcon,
+  RestoreOutlined as RestoreIcon,
+  DeleteOutlineOutlined as DeleteOutlineIcon,
+  DriveFileMoveOutlined as MoveToFolderIcon,
 } from "@mui/icons-material";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import Menu from "@mui/material/Menu";

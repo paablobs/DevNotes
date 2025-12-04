@@ -10,15 +10,15 @@ import {
   Grid,
 } from "@mui/material";
 import {
-  DashboardCustomize as DashboardCustomizeIcon,
-  Delete as DeleteIcon,
-  Star as StarIcon,
-  Folder as FolderIcon,
-  Clear as ClearIcon,
-  Notes as NotesIcon,
-  CreateNewFolder as CreateNewFolderIcon,
-  EditNote as NewNoteIcon,
-  Code as CodeIcon,
+  DashboardCustomizeOutlined as DashboardCustomizeIcon,
+  DeleteOutline as DeleteIcon,
+  StarOutline as StarIcon,
+  FolderOutlined as FolderIcon,
+  ClearOutlined as ClearIcon,
+  NotesOutlined as NotesIcon,
+  CreateNewFolderOutlined as CreateNewFolderIcon,
+  EditNoteOutlined as NewNoteIcon,
+  CodeOutlined as CodeIcon,
 } from "@mui/icons-material";
 import { yellow } from "@mui/material/colors";
 
@@ -113,7 +113,7 @@ const Sidebar = ({
               onClick={() => onViewChange(selectedView.FAVORITES)}
             >
               <ListItemIcon>
-                <StarIcon sx={{ color: yellow[700] }} />
+                <StarIcon />
               </ListItemIcon>
               <ListItemText primary="Favorites" />
             </ListItemButton>
